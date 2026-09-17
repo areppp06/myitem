@@ -1,307 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<title>MyItem – Find Your Stuff Fast</title>
-<meta name="theme-color" content="#0058A3"/>
-<link rel="icon" type="image/png" href="/api/images/8d720093-a322-4ab7-883c-6e938f9823b3.jpg"/>
-<link rel="icon" type="image/svg+xml" href="/logo-icon.svg"/>
-<link rel="apple-touch-icon" href="/api/images/d1248757-9f72-46bd-aa4a-f8489bfe61c2.jpg"/>
-<style>
-:root{
-  --ikea-yellow:#FFDA1A;
-  --ikea-blue:#0058A3;
-  --bg:#f4f6f8;
-  --card:#fff;
-  --text:#1a1a1a;
-  --muted:#6b7280;
-  --border:#e5e7eb;
-  --radius:14px;
-  --shadow:0 2px 10px rgba(0,0,0,.06);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:88px;
-}
-header{
-  background:#fff;
-  color:var(--text);
-  border-bottom:1px solid var(--border);
-  padding:12px 20px;
-  position:sticky;top:0;z-index:50;
-  box-shadow:0 1px 4px rgba(0,0,0,.08);
-  display:flex;align-items:center;gap:16px;
-}
-.logo{
-  display:flex;align-items:center;flex-shrink:0;text-decoration:none;
-}
-.logo-img{height:36px;width:auto;display:block}
-.search-wrap{
-  flex:1;max-width:480px;position:relative;margin:0 auto;
-}
-#search{
-  width:100%;padding:10px 14px 10px 40px;
-  border:1.5px solid var(--border);border-radius:999px;font-size:15px;
-  background:#f8f9fa;color:#111;outline:none;
-}
-#search:focus{border-color:var(--ikea-blue);background:#fff}
-.search-icon{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  display:flex;align-items:center;color:#9ca3af;pointer-events:none;
-}
-.header-actions{
-  display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;
-}
-.btn-add{
-  background:var(--ikea-yellow);color:var(--ikea-blue);
-  padding:8px 16px;border-radius:8px;border:none;
-  font-weight:700;font-size:.85rem;cursor:pointer;
-  display:inline-flex;align-items:center;gap:4px;
-  box-shadow:0 2px 6px rgba(0,0,0,.1);
-}
-.pfp{
-  width:36px;height:36px;border-radius:50%;
-  background:#f3f4f6;
-  border:2px solid var(--border);
-  display:flex;align-items:center;justify-content:center;
-  color:var(--muted);flex-shrink:0;
-  text-decoration:none;cursor:pointer;
-}
-.pfp:hover{background:#e5e7eb}
-.categories-wrap{
-  background:#fff;border-bottom:1px solid var(--border);
-  padding:12px 20px 8px;
-}
-.categories{
-  display:flex;gap:8px;overflow-x:auto;
-  -webkit-overflow-scrolling:touch;scrollbar-width:none;
-  padding-bottom:4px;
-}
-.categories::-webkit-scrollbar{display:none}
-.cat-chip{
-  flex-shrink:0;padding:7px 14px;border-radius:999px;
-  border:1.5px solid var(--border);background:#fff;
-  font-weight:600;font-size:.85rem;cursor:pointer;
-  color:var(--text);
-}
-.cat-chip.active{
-  background:var(--ikea-yellow);border-color:var(--ikea-yellow);
-  color:var(--ikea-blue);
-}
-.filter-meta{
-  font-size:.8rem;color:var(--muted);margin-top:8px;
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-}
-.filter-meta strong{color:var(--text);font-weight:700}
-.filter-meta .filter-tag{
-  background:#eef5ff;color:var(--ikea-blue);
-  padding:2px 8px;border-radius:6px;font-weight:600;font-size:.75rem;
-}
-.container{max-width:1200px;margin:0 auto;padding:20px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
-@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
-@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr);gap:18px}}
-.card{
-  background:var(--card);border-radius:var(--radius);
-  overflow:hidden;box-shadow:var(--shadow);
-  border:1px solid var(--border);
-  display:flex;flex-direction:column;
-}
-.card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
-.thumb-wrap{position:relative;width:100%;aspect-ratio:1;background:#eef0f2;overflow:hidden;}
-.thumb{width:100%;height:100%;object-fit:cover;display:block;}
-.thumb.placeholder{
-  width:100%;height:100%;
-  display:flex;align-items:center;justify-content:center;
-  background:linear-gradient(135deg,#eef0f2,#e0e4e8);
-  color:#b0b8c0;
-}
-.tag-stack{
-  position:absolute;top:8px;left:8px;
-  display:flex;flex-direction:column;gap:4px;
-  max-width:calc(100% - 16px);z-index:2;
-}
-.tag-badge{
-  background:rgba(0,88,163,.9);color:#fff;
-  padding:3px 8px;border-radius:6px;
-  font-size:.68rem;font-weight:600;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  max-width:100%;
-}
-.tag-badge .dot{margin-right:3px;opacity:.8}
-.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;flex:1}
-.card-name{
-  font-weight:700;font-size:.95rem;margin-bottom:4px;
-  line-height:1.3;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.card-notes{
-  font-size:.8rem;color:var(--muted);line-height:1.4;
-  margin-bottom:10px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
-}
-.card-notes:empty{display:none}
-.card-divider{height:1px;background:var(--border);margin:0 0 10px}
-.place-chip{
-  display:inline-flex;align-items:center;gap:5px;
-  background:#f3f4f6;color:#374151;
-  padding:5px 10px;border-radius:8px;
-  font-size:.78rem;font-weight:600;max-width:100%;
-}
-.place-chip svg{flex-shrink:0;opacity:.7}
-.place-chip .place-deleted{color:#c00;font-weight:700}
-.card{cursor:pointer;}
-.card-footer{
-  display:flex;align-items:flex-end;justify-content:space-between;
-  margin-top:auto;padding-top:10px;gap:8px;
-}
-.card-date-time{display:flex;flex-direction:column;align-items:flex-end;text-align:right;}
-.card-date{font-size:.72rem;color:var(--muted);font-weight:600;}
-.card-time{font-size:.65rem;color:var(--muted);opacity:0.8;}
-.card-actions{
-  display:flex;gap:6px;
-  max-width:0;overflow:hidden;opacity:0;
-  transition:all 0.3s ease;
-}
-.card.expanded .card-actions{max-width:100px;opacity:1;}
-.btn-icon-sm{
-  width:32px;height:32px;padding:0;border-radius:8px;border:none;
-  display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  flex-shrink:0;
-}
-.btn-icon-sm.btn-update{background:var(--ikea-yellow);color:var(--ikea-blue)}
-.btn-icon-sm.btn-del{background:#fff;border:1.5px solid #fecaca;color:#c00}
-.btn-icon-sm.btn-del:hover{background:#fee}
-.pagination{
-  display:flex;justify-content:center;align-items:center;gap:12px;
-  margin-top:28px;padding:12px;
-}
-.page-info{font-weight:600;color:var(--muted);font-size:.9rem}
-.btn-page{
-  background:#fff;border:1.5px solid var(--border);color:#333;
-  padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;cursor:pointer;
-}
-.btn-page:disabled{opacity:.4;cursor:not-allowed}
-.empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1}
-.empty h3{font-size:1.1rem;margin-bottom:6px;color:var(--text)}
-.loading{text-align:center;padding:48px;color:var(--muted);grid-column:1/-1}
-.fab{
-  position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;
-  background:var(--ikea-yellow);color:var(--ikea-blue);border:none;
-  font-size:28px;font-weight:300;line-height:1;
-  box-shadow:0 6px 20px rgba(0,0,0,.2);cursor:pointer;z-index:40;
-  display:flex;align-items:center;justify-content:center;
-}
-.fab:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.25)}
-.modal-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;
-  display:none;align-items:flex-end;justify-content:center;
-}
-@media(min-width:600px){.modal-overlay{align-items:center}}
-.modal-overlay.open{display:flex}
-.modal{
-  background:#fff;width:100%;max-width:480px;
-  border-radius:20px 20px 0 0;padding:24px 20px 28px;
-  max-height:90vh;overflow-y:auto;
-}
-@media(min-width:600px){.modal{border-radius:16px}}
-.modal h2{font-size:1.25rem;margin-bottom:18px;color:var(--ikea-blue)}
-.form-group{margin-bottom:16px}
-.form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:#444}
-.form-group input,.form-group textarea{
-  width:100%;padding:12px 14px;border:2px solid #e0e0e0;border-radius:10px;
-  font-size:16px;outline:none;font-family:inherit;
-}
-.form-group input:focus,.form-group textarea:focus{border-color:var(--ikea-blue)}
-textarea#itemNotes{resize:vertical;min-height:72px}
-.char-count{font-size:.75rem;color:#888;text-align:right;margin-top:4px}
-.photo-preview{width:120px;height:120px;border-radius:12px;object-fit:cover;background:#f0f0f0;display:none;margin-bottom:8px}
-.photo-preview.show{display:block}
-.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-.chip{padding:6px 12px;border-radius:999px;background:#f0f0f0;font-size:.85rem;cursor:pointer;border:2px solid transparent}
-.chip.selected{background:#e0f0ff;border-color:var(--ikea-blue);color:var(--ikea-blue);font-weight:600}
-.chip.disabled{opacity:.4;cursor:not-allowed}
-.add-new{color:var(--ikea-blue);font-weight:600;cursor:pointer;font-size:.9rem;margin-top:6px;display:inline-block}
-.modal-actions{display:flex;gap:10px;margin-top:20px}
-.modal-actions .btn{flex:1;padding:14px;border-radius:10px;border:none;font-weight:700;font-size:.9rem;cursor:pointer}
-.btn-outline{background:#f3f4f6;color:#333}
-.btn-primary{background:var(--ikea-blue);color:#fff}
-.btn-danger-full{background:#c00;color:#fff}
-.confirm-box{text-align:center;padding:8px 0 4px}
-.confirm-box .confirm-title{font-size:1.15rem;margin-bottom:8px;line-height:1.4}
-.confirm-box .confirm-delete{color:#c00;font-weight:800;font-size:1.2rem}
-.confirm-box .confirm-name{font-weight:800;font-size:1.15rem}
-.toast{
-  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
-  background:#222;color:#fff;padding:12px 22px;border-radius:999px;
-  font-size:.9rem;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;
-}
-.toast.show{opacity:1}
-@media(max-width:640px){
-  header{padding:10px 12px;gap:10px;flex-wrap:wrap}
-  .logo-img{height:30px}
-  .search-wrap{order:3;flex:1 1 100%;max-width:none;margin-top:4px}
-  .header-actions{gap:8px}
-  .btn-add{display:none !important;}
-  .pfp{width:32px;height:32px}
-  .categories-wrap{padding:10px 12px 6px}
-  .container{padding:14px 12px}
-}
-</style>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+  <title>MyItem – Find Your Stuff Fast</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f5ff', 100: '#e5edff', 500: '#0284c7', 600: '#0058A3', 700: '#0047a5',
+              accent: '#FFDA1A', accentHover: '#eab308',
+            }
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .item-card { transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1); cursor: pointer; }
+    .item-card:hover { transform: translateY(-3px); box-shadow: 0 12px 24px -10px rgba(15, 23, 42, 0.12), 0 4px 6px -2px rgba(15, 23, 42, 0.04); }
+    .img-zoom { transition: transform 0.35s ease; }
+    .item-card:hover .img-zoom { transform: scale(1.035); }
+    .card-actions { max-width: 0; overflow: hidden; opacity: 0; transition: all 0.3s ease; }
+    .item-card.expanded .card-actions, .item-card:hover .card-actions { max-width: 100px; opacity: 1; }
+    
+    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 100; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(2px); }
+    @media(min-width:600px){ .modal-overlay { align-items: center; } }
+    .modal-overlay.open { display: flex; }
+    .toast { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 12px 22px; border-radius: 99px; font-size: 0.9rem; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+  </style>
 </head>
-<body>
-<header>
-  <a href="/" class="logo" aria-label="MyItem"><img src="/api/images/88fb26bb-bec6-4a7c-8d2a-0033ff74006e.jpg" alt="MyItem" class="logo-img" height="36"/></a>
-  <div class="search-wrap">
-    <span class="search-icon">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
-    </span>
-    <input type="search" id="search" placeholder="Search items, places..." autocomplete="off"/>
-  </div>
-  <div class="header-actions">
-    <button class="btn-add" id="btnAddTop" type="button">+ Add Item</button>
-    <a href="/manage.html" class="pfp" title="Manage">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </a>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-brand-accent selection:text-slate-900 pb-24">
+
+<header class="sticky top-0 z-40 bg-white border-b border-slate-200/90 shadow-sm backdrop-blur-md bg-white/95">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <div class="flex items-center space-x-3 shrink-0">
+        <a class="flex items-center gap-2.5 group" href="/">
+          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-500 flex items-center justify-center shadow-sm text-white font-bold text-lg group-hover:scale-105 transition-transform">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          </div>
+          <div class="hidden sm:flex items-baseline">
+            <span class="text-xl font-bold tracking-tight text-slate-900">My<span class="text-brand-600">Item</span></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-brand-accent ml-0.5 inline-block"></span>
+          </div>
+        </a>
+      </div>
+      <div class="flex-1 max-w-2xl px-2">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg>
+          </div>
+          <input id="search" class="w-full pl-10 pr-4 py-2 bg-slate-100 hover:bg-slate-100/90 focus:bg-white text-sm text-slate-800 placeholder-slate-400 rounded-full border border-transparent focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all outline-none" placeholder="Search items, places, tags..." type="text" autocomplete="off"/>
+        </div>
+      </div>
+      <div class="flex items-center space-x-2 shrink-0">
+        <button id="btnAddTop" class="hidden md:inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-slate-900 bg-brand-accent hover:bg-brand-accentHover rounded-lg shadow-sm hover:shadow transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+          <span>Add Item</span>
+        </button>
+        <a href="/manage.html" class="h-8 w-8 rounded-full bg-slate-900 text-white flex items-center justify-center font-medium text-xs ring-2 ring-slate-100 ring-offset-1 hover:bg-slate-800 transition">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </a>
+      </div>
+    </div>
   </div>
 </header>
-<div class="categories-wrap">
-  <div class="categories" id="categories"></div>
-  <div class="filter-meta" id="filterMeta"></div>
-</div>
-<div class="container">
-  <div id="grid" class="grid"><div class="loading">Loading your items...</div></div>
-  <div class="pagination" id="pagination" style="display:none"></div>
-</div>
-<button class="fab" id="fab" type="button" title="Add item" aria-label="Add item">+</button>
+
+<section class="bg-white border-b border-slate-200/80 py-3.5">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 pt-0.5" id="categories">
+    </div>
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between pt-3 text-xs text-slate-500 gap-2">
+      <div class="flex items-center gap-1.5" id="filterMeta">
+      </div>
+    </div>
+  </div>
+</section>
+
+<main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+  <div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 sm:gap-6">
+    <div class="col-span-full text-center py-12 text-slate-500">Loading your items...</div>
+  </div>
+  <div class="flex justify-center items-center gap-3 mt-8" id="pagination" style="display:none"></div>
+</main>
+
+<button id="fab" class="fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full bg-brand-accent hover:bg-brand-accentHover text-slate-900 shadow-lg hover:shadow-xl flex items-center justify-center active:scale-95 transition-all focus:outline-none focus:ring-4 focus:ring-brand-accent/40">
+  <svg class="w-7 h-7 stroke-slate-950" fill="none" stroke="currentColor" stroke-width="2.6" viewBox="0 0 24 24"><path d="M12 4.5v15m7.5-7.5h-15" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+</button>
+
+<!-- Add/Edit Modal -->
 <div class="modal-overlay" id="modal">
-  <div class="modal">
-    <h2 id="modalTitle">Add Item</h2>
-    <div class="form-group"><label>Photo (thumbnail)</label><img id="photoPreview" class="photo-preview" alt="Preview"/><input type="file" id="photoInput" accept="image/*"/></div>
-    <div class="form-group"><label>Name *</label><input type="text" id="itemName" placeholder="e.g. MacBook charger" required/></div>
-    <div class="form-group"><label>Place</label><div class="chip-list" id="placeChips"></div><span class="add-new" id="addPlaceBtn">+ Add new place</span></div>
-    <div class="form-group"><label>Tags (categories) * <span style="font-weight:400;color:#888">max 3</span></label><div class="chip-list" id="tagChips"></div><span class="add-new" id="addTagBtn">+ Create new tag</span><div style="font-size:.8rem;color:#888;margin-top:6px">At least one tag is required (up to 3)</div></div>
-    <div class="form-group"><label>Note</label><textarea id="itemNotes" placeholder="Optional short note..." maxlength="300"></textarea><div class="char-count"><span id="notesCount">0</span>/300</div></div>
-    <div class="modal-actions"><button class="btn btn-outline" id="cancelBtn" type="button">Cancel</button><button class="btn btn-primary" id="saveBtn" type="button">Save Item</button></div>
+  <div class="bg-white w-full max-w-lg rounded-t-2xl sm:rounded-2xl p-6 max-h-[90vh] overflow-y-auto shadow-xl">
+    <h2 id="modalTitle" class="text-xl font-bold text-brand-700 mb-5">Add Item</h2>
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Photo (thumbnail)</label>
+      <img id="photoPreview" class="hidden w-28 h-28 rounded-xl object-cover bg-slate-100 mb-2 border border-slate-200" alt="Preview"/>
+      <input type="file" id="photoInput" accept="image/*" class="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer"/>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Name *</label>
+      <input type="text" id="itemName" placeholder="e.g. MacBook charger" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition"/>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Place</label>
+      <div class="flex flex-wrap gap-2 mb-2" id="placeChips"></div>
+      <button class="text-brand-600 font-medium text-sm hover:underline" id="addPlaceBtn" type="button">+ Add new place</button>
+    </div>
+    <div class="mb-4">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Tags (categories) * <span class="font-normal text-slate-400">max 3</span></label>
+      <div class="flex flex-wrap gap-2 mb-2" id="tagChips"></div>
+      <button class="text-brand-600 font-medium text-sm hover:underline" id="addTagBtn" type="button">+ Create new tag</button>
+    </div>
+    <div class="mb-6">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">Note</label>
+      <textarea id="itemNotes" placeholder="Optional short note..." maxlength="300" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition min-h-[80px] resize-y"></textarea>
+      <div class="text-xs text-slate-400 text-right mt-1"><span id="notesCount">0</span>/300</div>
+    </div>
+    <div class="flex gap-3 pt-2">
+      <button class="flex-1 py-3 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition" id="cancelBtn" type="button">Cancel</button>
+      <button class="flex-1 py-3 rounded-xl font-bold text-white bg-brand-600 hover:bg-brand-700 transition" id="saveBtn" type="button">Save Item</button>
+    </div>
   </div>
 </div>
+
+<!-- Name Modal -->
 <div class="modal-overlay" id="nameModal">
-  <div class="modal" style="max-width:360px">
-    <h2 id="nameModalTitle">Add</h2>
-    <div class="form-group"><input type="text" id="nameModalInput" placeholder="Name" autocomplete="off"/></div>
-    <div class="modal-actions"><button class="btn btn-outline" id="nameModalCancel" type="button">Cancel</button><button class="btn btn-primary" id="nameModalSave" type="button">Add</button></div>
+  <div class="bg-white w-full max-w-sm rounded-t-2xl sm:rounded-2xl p-6 shadow-xl">
+    <h2 id="nameModalTitle" class="text-lg font-bold text-brand-700 mb-4">Add</h2>
+    <input type="text" id="nameModalInput" placeholder="Name" autocomplete="off" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 outline-none transition mb-6"/>
+    <div class="flex gap-3">
+      <button class="flex-1 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition" id="nameModalCancel" type="button">Cancel</button>
+      <button class="flex-1 py-2.5 rounded-xl font-bold text-white bg-brand-600 hover:bg-brand-700 transition" id="nameModalSave" type="button">Add</button>
+    </div>
   </div>
 </div>
+
+<!-- Confirm Modal -->
 <div class="modal-overlay" id="confirmModal">
-  <div class="modal" style="max-width:360px">
-    <div class="confirm-box"><div class="confirm-title"><span class="confirm-delete">DELETE</span> <span class="confirm-name" id="confirmItemName"></span></div>
-    <p style="color:#666;font-size:.9rem;margin-bottom:18px">This cannot be undone.</p></div>
-    <div class="modal-actions"><button class="btn btn-outline" id="confirmCancel" type="button">Cancel</button><button class="btn btn-danger-full" id="confirmDelete" type="button">Delete</button></div>
+  <div class="bg-white w-full max-w-sm rounded-t-2xl sm:rounded-2xl p-6 shadow-xl text-center">
+    <h2 class="text-lg mb-2 leading-snug"><span class="text-red-600 font-black">DELETE</span> <span class="font-bold text-slate-800" id="confirmItemName"></span></h2>
+    <p class="text-sm text-slate-500 mb-6">This cannot be undone.</p>
+    <div class="flex gap-3">
+      <button class="flex-1 py-2.5 rounded-xl font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 transition" id="confirmCancel" type="button">Cancel</button>
+      <button class="flex-1 py-2.5 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition" id="confirmDelete" type="button">Delete</button>
+    </div>
   </div>
 </div>
+
 <div class="toast" id="toast"></div>
+
 <script>
 const API="/api";
 const MAX_TAGS=3;
@@ -315,12 +173,108 @@ async function fetchItems(){var p=new URLSearchParams({page:String(state.page),l
 async function fetchPlaces(){var res=await fetch(API+"/places");state.places=await res.json();renderPlaceChips()}
 async function fetchTags(){var res=await fetch(API+"/tags");state.tags=await res.json();renderTagChips()}
 async function fetchCategories(){var res=await fetch(API+"/categories");var cats=await res.json();if(cats.length){var idx=cats.findIndex(function(c){return c.toLowerCase()==="uncategorized"});if(idx!==-1){var u=cats.splice(idx,1)[0];cats.push(u)}state.categories=cats}else{state.categories=["All"]}renderCategories()}
-function renderCategories(){document.getElementById("categories").innerHTML=state.categories.map(function(c){return "<button class=\"cat-chip "+(c===state.currentTag?"active":"")+"\" data-cat=\""+escapeHtml(c)+"\">"+escapeHtml(c)+"</button>"}).join("")}
-function renderFilterMeta(){var el=document.getElementById("filterMeta");var count=state.total;var label=count===1?"1 item tracked":count+" items tracked";if(state.currentTag&&state.currentTag!=="All"){el.innerHTML="<strong>"+label+"</strong> — Filtered by: <span class=\"filter-tag\">"+escapeHtml(state.currentTag)+"</span>"}else if(state.search){el.innerHTML="<strong>"+label+"</strong> — Search: <span class=\"filter-tag\">"+escapeHtml(state.search)+"</span>"}else{el.innerHTML="<strong>"+label+"</strong>"}}
-function renderPlaceChips(){document.getElementById("placeChips").innerHTML=state.places.map(function(p){return "<span class=\"chip "+(state.selectedPlaceId==p.id?"selected":"")+"\" data-id=\""+p.id+"\">"+escapeHtml(p.name)+"</span>"}).join("")}
-function renderTagChips(){var atMax=state.selectedTags.size>=MAX_TAGS;document.getElementById("tagChips").innerHTML=state.tags.filter(function(t){return (t.name||"").toLowerCase()!=="uncategorized"}).map(function(t){var sel=state.selectedTags.has(t.id);var disabled=atMax&&!sel;return "<span class=\"chip "+(sel?"selected":"")+(disabled?" disabled":"")+"\" data-id=\""+t.id+"\">"+escapeHtml(t.name)+"</span>"}).join("")}
-function renderGrid(){var grid=document.getElementById("grid");if(!state.items.length){grid.innerHTML="<div class=\"empty\"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>";return}var pencil="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z\"/></svg>";var trash="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><line x1=\"10\" y1=\"11\" x2=\"10\" y2=\"17\"/><line x1=\"14\" y1=\"11\" x2=\"14\" y2=\"17\"/></svg>";grid.innerHTML=state.items.map(function(item){var img=item.image_url?"<img class=\"thumb\" src=\""+item.image_url+"\" alt=\""+escapeHtml(item.name)+"\" loading=\"lazy\"/>":"<div class=\"thumb placeholder\"><svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><path d=\"M21 15l-5-5L5 21\"/></svg></div>";var tags=(item.tags||[]).filter(function(t){return (t||"").toLowerCase()!=="uncategorized"}).slice(0,MAX_TAGS);var tagStack=tags.length?"<div class=\"tag-stack\">"+tags.map(function(t){return "<span class=\"tag-badge\"><span class=\"dot\">&middot;</span>"+escapeHtml(t)+"</span>"}).join("")+"</div>":"";var placeInner=item.place_name?escapeHtml(item.place_name):"<span class=\"place-deleted\">Place deleted</span>, update required";var placeChip="<span class=\"place-chip\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>"+placeInner+"</span>";var notes=item.notes?"<div class=\"card-notes\">"+escapeHtml(item.notes)+"</div>":"";var dt=formatDateTime(item.updated_at);var dateHtml="<div class=\"card-date-time\"><span class=\"card-date\">"+dt.date+"</span><span class=\"card-time\">"+dt.time+"</span></div>";var actionsHtml="<div class=\"card-actions\"><button class=\"btn-icon-sm btn-update edit-btn\" data-id=\""+item.id+"\" title=\"Update\" aria-label=\"Update\">"+pencil+"</button><button class=\"btn-icon-sm btn-del delete-btn\" data-id=\""+item.id+"\" data-name=\""+escapeHtml(item.name)+"\" title=\"Delete\" aria-label=\"Delete\">"+trash+"</button></div>";return "<div class=\"card\" data-id=\""+item.id+"\"><div class=\"thumb-wrap\">"+img+tagStack+"</div><div class=\"card-body\"><div class=\"card-name\">"+escapeHtml(item.name)+"</div>"+notes+"<div class=\"card-divider\"></div>"+placeChip+"<div class=\"card-divider\" style=\"margin-top:10px\"></div><div class=\"card-footer\">"+actionsHtml+dateHtml+"</div></div></div>"}).join("")}
-function renderPagination(){var el=document.getElementById("pagination");if(state.totalPages<=1){el.style.display="none";return}el.style.display="flex";var prevDis=state.page<=1?" disabled":"";var nextDis=state.page>=state.totalPages?" disabled":"";el.innerHTML="<button class=\"btn-page\" id=\"prevPage\""+prevDis+">Prev</button><span class=\"page-info\">"+state.page+" / "+state.totalPages+"</span><button class=\"btn-page\" id=\"nextPage\""+nextDis+">Next</button>"}
+function renderCategories(){
+  let html = state.categories.map(function(c){
+    let isActive = c === state.currentTag;
+    let baseCls = "shrink-0 inline-flex items-center px-3.5 py-1.5 rounded-full text-xs font-medium transition cursor-pointer ";
+    if (isActive) {
+      baseCls += "bg-brand-accent text-slate-900 shadow-sm font-semibold";
+    } else {
+      baseCls += "text-slate-600 hover:text-slate-900 bg-white border border-slate-200 hover:border-slate-300 hover:bg-slate-50";
+    }
+    return "<button class=\""+baseCls+" cat-chip\" data-cat=\""+escapeHtml(c)+"\">"+escapeHtml(c)+"</button>";
+  }).join("");
+  html += `<button id="addTagBtnHome" class="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-medium text-slate-500 hover:text-slate-800 border border-dashed border-slate-300 hover:border-slate-400 hover:bg-white transition cursor-pointer"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path></svg><span>Category</span></button>`;
+  document.getElementById("categories").innerHTML = html;
+  document.getElementById("addTagBtnHome").addEventListener("click", function(){ openNameModal("tag"); });
+}
+function renderFilterMeta(){
+  var el=document.getElementById("filterMeta");
+  var count=state.total;
+  var label=count===1?"1 tracked item":count+" tracked items";
+  if(state.currentTag&&state.currentTag!=="All"){
+    el.innerHTML="<span class=\"font-medium text-slate-700\">"+label+"</span><span>•</span><span>Filtered by: <span class=\"font-medium text-slate-600\">"+escapeHtml(state.currentTag)+"</span></span>";
+  } else if(state.search){
+    el.innerHTML="<span class=\"font-medium text-slate-700\">"+label+"</span><span>•</span><span>Search: <span class=\"font-medium text-slate-600\">"+escapeHtml(state.search)+"</span></span>";
+  } else {
+    el.innerHTML="<span class=\"font-medium text-slate-700\">"+label+"</span>";
+  }
+}
+function renderPlaceChips(){
+  document.getElementById("placeChips").innerHTML=state.places.map(function(p){
+    let sel = state.selectedPlaceId == p.id;
+    let cls = sel ? "bg-brand-100 text-brand-700 border-brand-500 font-semibold" : "bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200";
+    return `<span class="px-3 py-1.5 rounded-full text-sm cursor-pointer border-2 transition ${cls} chip" data-id="${p.id}">${escapeHtml(p.name)}</span>`;
+  }).join("");
+}
+function renderTagChips(){
+  var atMax=state.selectedTags.size>=MAX_TAGS;
+  document.getElementById("tagChips").innerHTML=state.tags.filter(t => (t.name||"").toLowerCase()!=="uncategorized").map(function(t){
+    let sel = state.selectedTags.has(t.id);
+    let disabled = atMax && !sel;
+    let cls = sel ? "bg-brand-100 text-brand-700 border-brand-500 font-semibold" : "bg-slate-100 text-slate-600 border-transparent hover:bg-slate-200";
+    if (disabled) cls += " opacity-40 cursor-not-allowed";
+    return `<span class="px-3 py-1.5 rounded-full text-sm cursor-pointer border-2 transition ${cls} chip ${disabled?'disabled':''}" data-id="${t.id}">${escapeHtml(t.name)}</span>`;
+  }).join("");
+}
+function renderGrid(){
+  var grid=document.getElementById("grid");
+  if(!state.items.length){
+    grid.innerHTML="<div class=\"col-span-full text-center py-12 text-slate-500\"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>";
+    return;
+  }
+  var pencil=`<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+  var trash=`<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`;
+  grid.innerHTML=state.items.map(function(item){
+    var dt=formatDateTime(item.updated_at);
+    var imgHtml = item.image_url 
+      ? `<img src="${item.image_url}" alt="${escapeHtml(item.name)}" class="w-full h-full object-cover img-zoom" loading="lazy" />`
+      : `<div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-slate-100 to-slate-200 text-slate-400"><svg class="w-14 h-14 text-slate-300 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg></div>`;
+    var tags = (item.tags||[]).filter(t => (t||"").toLowerCase()!=="uncategorized").slice(0, 3);
+    var tagHtml = tags.map(t => `<span class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-white/90 backdrop-blur-sm text-slate-800 shadow-sm border border-white/40">${escapeHtml(t)}</span>`).join("");
+    var placeName = item.place_name ? escapeHtml(item.place_name) : "Place deleted";
+    var placeIcon = `<svg class="w-3.5 h-3.5 text-brand-500 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-linecap="round" stroke-linejoin="round"></path><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
+    var notes = item.notes ? `<p class="text-[11px] text-slate-400 mt-0.5 line-clamp-2">${escapeHtml(item.notes)}</p>` : "";
+    return `
+    <article class="card item-card bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm flex flex-col group relative" data-id="${item.id}">
+      <div class="relative w-full aspect-square sm:aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
+        ${imgHtml}
+        <div class="absolute top-2.5 left-2.5 flex flex-wrap gap-1.5 z-10">${tagHtml}</div>
+      </div>
+      <div class="p-4 flex-1 flex flex-col justify-between">
+        <div>
+          <h3 class="font-semibold text-slate-900 text-sm leading-snug group-hover:text-brand-600 transition-colors line-clamp-2">${escapeHtml(item.name)}</h3>
+          ${notes}
+          <div class="mt-3 flex items-center gap-1.5 text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+            ${placeIcon}
+            <span class="font-medium text-slate-700 truncate">${placeName}</span>
+          </div>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 flex items-end justify-between">
+          <div class="card-actions flex gap-1.5">
+            <button class="edit-btn p-1.5 rounded-lg bg-brand-accent text-brand-700 hover:bg-brand-accentHover transition" data-id="${item.id}" title="Edit">${pencil}</button>
+            <button class="delete-btn p-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition" data-id="${item.id}" data-name="${escapeHtml(item.name)}" title="Delete">${trash}</button>
+          </div>
+          <div class="text-[11px] text-slate-400 text-right flex flex-col">
+            <span class="font-semibold text-slate-500">${dt.date}</span>
+            <span>${dt.time}</span>
+          </div>
+        </div>
+      </div>
+    </article>
+    `;
+  }).join("");
+}
+function renderPagination(){
+  var el=document.getElementById("pagination");
+  if(state.totalPages<=1){el.style.display="none";return}
+  el.style.display="flex";
+  var prevDis=state.page<=1?" opacity-40 cursor-not-allowed":"";
+  var nextDis=state.page>=state.totalPages?" opacity-40 cursor-not-allowed":"";
+  el.innerHTML=`<button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 ${prevDis}" id="prevPage">Prev</button>
+  <span class="text-sm font-semibold text-slate-500">${state.page} / ${state.totalPages}</span>
+  <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 ${nextDis}" id="nextPage">Next</button>`;
+}el.style.display="flex";var prevDis=state.page<=1?" disabled":"";var nextDis=state.page>=state.totalPages?" disabled":"";el.innerHTML="<button class=\"btn-page\" id=\"prevPage\""+prevDis+">Prev</button><span class=\"page-info\">"+state.page+" / "+state.totalPages+"</span><button class=\"btn-page\" id=\"nextPage\""+nextDis+">Next</button>"}
 function openModal(edit){state.editingId=edit?edit.id:null;state.selectedPlaceId=edit&&edit.place_id?edit.place_id:null;state.selectedTags=new Set();state.imageKey=edit&&edit.image_key?edit.image_key:null;document.getElementById("modalTitle").textContent=edit?"Update Item":"Add Item";document.getElementById("itemName").value=edit&&edit.name?edit.name:"";var notesEl=document.getElementById("itemNotes");notesEl.value=edit&&edit.notes?edit.notes:"";document.getElementById("notesCount").textContent=String(notesEl.value.length);document.getElementById("photoPreview").classList.remove("show");document.getElementById("photoInput").value="";if(edit&&edit.image_url){var p=document.getElementById("photoPreview");p.src=edit.image_url;p.classList.add("show")}if(edit&&edit.tags){edit.tags.forEach(function(n){if((n||"").toLowerCase()==="uncategorized")return;var f=state.tags.find(function(t){return t.name===n});if(f&&state.selectedTags.size<MAX_TAGS)state.selectedTags.add(f.id)})}renderPlaceChips();renderTagChips();document.getElementById("modal").classList.add("open")}
 function closeModal(){document.getElementById("modal").classList.remove("open");state.editingId=null;state.imageKey=null}
 document.getElementById("fab").addEventListener("click",function(){openModal(null)});
