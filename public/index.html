@@ -54,12 +54,6 @@ header{
 .header-actions{
   display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;
 }
-.btn-manage{
-  background:transparent;border:1.5px solid var(--border);
-  color:var(--ikea-blue);padding:8px 14px;border-radius:8px;
-  font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:none;
-}
-.btn-manage:hover{background:#f0f7ff;border-color:var(--ikea-blue)}
 .btn-add{
   background:var(--ikea-yellow);color:var(--ikea-blue);
   padding:8px 16px;border-radius:8px;border:none;
@@ -73,7 +67,9 @@ header{
   border:2px solid var(--border);
   display:flex;align-items:center;justify-content:center;
   color:var(--muted);flex-shrink:0;
+  text-decoration:none;cursor:pointer;
 }
+.pfp:hover{background:#e5e7eb}
 .categories-wrap{
   background:#fff;border-bottom:1px solid var(--border);
   padding:12px 20px 8px;
@@ -114,8 +110,8 @@ header{
   display:flex;flex-direction:column;
 }
 .card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
-.thumb-wrap{position:relative;width:100%;aspect-ratio:1;background:#eef0f2}
-.thumb{width:100%;height:100%;object-fit:cover;display:block}
+.thumb-wrap{position:relative;width:100%;aspect-ratio:1;background:#eef0f2;overflow:hidden;}
+.thumb{width:100%;height:100%;object-fit:cover;display:block;}
 .thumb.placeholder{
   width:100%;height:100%;
   display:flex;align-items:center;justify-content:center;
@@ -156,15 +152,24 @@ header{
 }
 .place-chip svg{flex-shrink:0;opacity:.7}
 .place-chip .place-deleted{color:#c00;font-weight:700}
+.card{cursor:pointer;}
 .card-footer{
-  display:flex;align-items:center;justify-content:space-between;
+  display:flex;align-items:flex-end;justify-content:space-between;
   margin-top:auto;padding-top:10px;gap:8px;
 }
-.card-date{font-size:.72rem;color:var(--muted)}
-.card-actions{display:flex;gap:6px}
+.card-date-time{display:flex;flex-direction:column;align-items:flex-end;text-align:right;}
+.card-date{font-size:.72rem;color:var(--muted);font-weight:600;}
+.card-time{font-size:.65rem;color:var(--muted);opacity:0.8;}
+.card-actions{
+  display:flex;gap:6px;
+  max-width:0;overflow:hidden;opacity:0;
+  transition:all 0.3s ease;
+}
+.card.expanded .card-actions{max-width:100px;opacity:1;}
 .btn-icon-sm{
   width:32px;height:32px;padding:0;border-radius:8px;border:none;
   display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  flex-shrink:0;
 }
 .btn-icon-sm.btn-update{background:var(--ikea-yellow);color:var(--ikea-blue)}
 .btn-icon-sm.btn-del{background:#fff;border:1.5px solid #fecaca;color:#c00}
@@ -239,8 +244,7 @@ textarea#itemNotes{resize:vertical;min-height:72px}
   .logo-img{height:30px}
   .search-wrap{order:3;flex:1 1 100%;max-width:none;margin-top:4px}
   .header-actions{gap:8px}
-  .btn-manage{padding:7px 10px;font-size:.8rem}
-  .btn-add{padding:7px 12px;font-size:.8rem}
+  .btn-add{display:none !important;}
   .pfp{width:32px;height:32px}
   .categories-wrap{padding:10px 12px 6px}
   .container{padding:14px 12px}
@@ -257,11 +261,10 @@ textarea#itemNotes{resize:vertical;min-height:72px}
     <input type="search" id="search" placeholder="Search items, places..." autocomplete="off"/>
   </div>
   <div class="header-actions">
-    <a href="/manage.html" class="btn-manage">Manage</a>
     <button class="btn-add" id="btnAddTop" type="button">+ Add Item</button>
-    <div class="pfp" title="Profile">
+    <a href="/manage.html" class="pfp" title="Manage">
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-    </div>
+    </a>
   </div>
 </header>
 <div class="categories-wrap">
@@ -306,7 +309,7 @@ let state={items:[],places:[],tags:[],categories:["All"],currentTag:"All",search
 function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(function(){t.classList.remove("show")},2200)}
 function debounce(fn,ms){var t;return function(){var a=arguments,c=this;clearTimeout(t);t=setTimeout(function(){fn.apply(c,a)},ms)}}
 function escapeHtml(s){if(!s)return"";return String(s).replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;")}
-function formatDate(iso){if(!iso)return"-";return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+function formatDateTime(iso){if(!iso)return{date:"-",time:""};var d=new Date(iso);var dt=d.toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});var tm=d.toLocaleTimeString(undefined,{hour:"2-digit",minute:"2-digit"});return{date:dt,time:tm}}
 async function compressImage(file,maxWidth,quality){maxWidth=maxWidth||500;quality=quality||0.75;return new Promise(function(resolve){var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var c=document.createElement("canvas");var w=img.width,h=img.height;if(w>maxWidth){h=(h*maxWidth)/w;w=maxWidth}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);c.toBlob(function(b){resolve(b)},"image/jpeg",quality)};img.src=e.target.result};rd.readAsDataURL(file)})}
 async function fetchItems(){var p=new URLSearchParams({page:String(state.page),limit:"10"});if(state.search)p.set("search",state.search);if(state.currentTag&&state.currentTag!=="All")p.set("tag",state.currentTag);var res=await fetch(API+"/items?"+p.toString());var data=await res.json();state.items=data.items||[];state.totalPages=(data.pagination&&data.pagination.totalPages)||1;state.total=(data.pagination&&data.pagination.total)||0;renderGrid();renderPagination();renderFilterMeta()}
 async function fetchPlaces(){var res=await fetch(API+"/places");state.places=await res.json();renderPlaceChips()}
@@ -316,7 +319,7 @@ function renderCategories(){document.getElementById("categories").innerHTML=stat
 function renderFilterMeta(){var el=document.getElementById("filterMeta");var count=state.total;var label=count===1?"1 item tracked":count+" items tracked";if(state.currentTag&&state.currentTag!=="All"){el.innerHTML="<strong>"+label+"</strong> — Filtered by: <span class=\"filter-tag\">"+escapeHtml(state.currentTag)+"</span>"}else if(state.search){el.innerHTML="<strong>"+label+"</strong> — Search: <span class=\"filter-tag\">"+escapeHtml(state.search)+"</span>"}else{el.innerHTML="<strong>"+label+"</strong>"}}
 function renderPlaceChips(){document.getElementById("placeChips").innerHTML=state.places.map(function(p){return "<span class=\"chip "+(state.selectedPlaceId==p.id?"selected":"")+"\" data-id=\""+p.id+"\">"+escapeHtml(p.name)+"</span>"}).join("")}
 function renderTagChips(){var atMax=state.selectedTags.size>=MAX_TAGS;document.getElementById("tagChips").innerHTML=state.tags.filter(function(t){return (t.name||"").toLowerCase()!=="uncategorized"}).map(function(t){var sel=state.selectedTags.has(t.id);var disabled=atMax&&!sel;return "<span class=\"chip "+(sel?"selected":"")+(disabled?" disabled":"")+"\" data-id=\""+t.id+"\">"+escapeHtml(t.name)+"</span>"}).join("")}
-function renderGrid(){var grid=document.getElementById("grid");if(!state.items.length){grid.innerHTML="<div class=\"empty\"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>";return}var pencil="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z\"/></svg>";var trash="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><line x1=\"10\" y1=\"11\" x2=\"10\" y2=\"17\"/><line x1=\"14\" y1=\"11\" x2=\"14\" y2=\"17\"/></svg>";grid.innerHTML=state.items.map(function(item){var img=item.image_url?"<img class=\"thumb\" src=\""+item.image_url+"\" alt=\""+escapeHtml(item.name)+"\" loading=\"lazy\"/>":"<div class=\"thumb placeholder\"><svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><path d=\"M21 15l-5-5L5 21\"/></svg></div>";var tags=(item.tags||[]).filter(function(t){return (t||"").toLowerCase()!=="uncategorized"}).slice(0,MAX_TAGS);var tagStack=tags.length?"<div class=\"tag-stack\">"+tags.map(function(t){return "<span class=\"tag-badge\"><span class=\"dot\">&middot;</span>"+escapeHtml(t)+"</span>"}).join("")+"</div>":"";var placeInner=item.place_name?escapeHtml(item.place_name):"<span class=\"place-deleted\">Place deleted</span>, update required";var placeChip="<span class=\"place-chip\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>"+placeInner+"</span>";var notes=item.notes?"<div class=\"card-notes\">"+escapeHtml(item.notes)+"</div>":"";return "<div class=\"card\" data-id=\""+item.id+"\"><div class=\"thumb-wrap\">"+img+tagStack+"</div><div class=\"card-body\"><div class=\"card-name\">"+escapeHtml(item.name)+"</div>"+notes+"<div class=\"card-divider\"></div>"+placeChip+"<div class=\"card-divider\" style=\"margin-top:10px\"></div><div class=\"card-footer\"><span class=\"card-date\">"+formatDate(item.updated_at)+"</span><div class=\"card-actions\"><button class=\"btn-icon-sm btn-update edit-btn\" data-id=\""+item.id+"\" title=\"Update\" aria-label=\"Update\">"+pencil+"</button><button class=\"btn-icon-sm btn-del delete-btn\" data-id=\""+item.id+"\" data-name=\""+escapeHtml(item.name)+"\" title=\"Delete\" aria-label=\"Delete\">"+trash+"</button></div></div></div></div>"}).join("")}
+function renderGrid(){var grid=document.getElementById("grid");if(!state.items.length){grid.innerHTML="<div class=\"empty\"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>";return}var pencil="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M12 20h9\"/><path d=\"M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z\"/></svg>";var trash="<svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"3 6 5 6 21 6\"/><path d=\"M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2\"/><line x1=\"10\" y1=\"11\" x2=\"10\" y2=\"17\"/><line x1=\"14\" y1=\"11\" x2=\"14\" y2=\"17\"/></svg>";grid.innerHTML=state.items.map(function(item){var img=item.image_url?"<img class=\"thumb\" src=\""+item.image_url+"\" alt=\""+escapeHtml(item.name)+"\" loading=\"lazy\"/>":"<div class=\"thumb placeholder\"><svg width=\"40\" height=\"40\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.5\"><rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\"/><circle cx=\"8.5\" cy=\"8.5\" r=\"1.5\"/><path d=\"M21 15l-5-5L5 21\"/></svg></div>";var tags=(item.tags||[]).filter(function(t){return (t||"").toLowerCase()!=="uncategorized"}).slice(0,MAX_TAGS);var tagStack=tags.length?"<div class=\"tag-stack\">"+tags.map(function(t){return "<span class=\"tag-badge\"><span class=\"dot\">&middot;</span>"+escapeHtml(t)+"</span>"}).join("")+"</div>":"";var placeInner=item.place_name?escapeHtml(item.place_name):"<span class=\"place-deleted\">Place deleted</span>, update required";var placeChip="<span class=\"place-chip\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z\"/><circle cx=\"12\" cy=\"10\" r=\"3\"/></svg>"+placeInner+"</span>";var notes=item.notes?"<div class=\"card-notes\">"+escapeHtml(item.notes)+"</div>":"";var dt=formatDateTime(item.updated_at);var dateHtml="<div class=\"card-date-time\"><span class=\"card-date\">"+dt.date+"</span><span class=\"card-time\">"+dt.time+"</span></div>";var actionsHtml="<div class=\"card-actions\"><button class=\"btn-icon-sm btn-update edit-btn\" data-id=\""+item.id+"\" title=\"Update\" aria-label=\"Update\">"+pencil+"</button><button class=\"btn-icon-sm btn-del delete-btn\" data-id=\""+item.id+"\" data-name=\""+escapeHtml(item.name)+"\" title=\"Delete\" aria-label=\"Delete\">"+trash+"</button></div>";return "<div class=\"card\" data-id=\""+item.id+"\"><div class=\"thumb-wrap\">"+img+tagStack+"</div><div class=\"card-body\"><div class=\"card-name\">"+escapeHtml(item.name)+"</div>"+notes+"<div class=\"card-divider\"></div>"+placeChip+"<div class=\"card-divider\" style=\"margin-top:10px\"></div><div class=\"card-footer\">"+actionsHtml+dateHtml+"</div></div></div>"}).join("")}
 function renderPagination(){var el=document.getElementById("pagination");if(state.totalPages<=1){el.style.display="none";return}el.style.display="flex";var prevDis=state.page<=1?" disabled":"";var nextDis=state.page>=state.totalPages?" disabled":"";el.innerHTML="<button class=\"btn-page\" id=\"prevPage\""+prevDis+">Prev</button><span class=\"page-info\">"+state.page+" / "+state.totalPages+"</span><button class=\"btn-page\" id=\"nextPage\""+nextDis+">Next</button>"}
 function openModal(edit){state.editingId=edit?edit.id:null;state.selectedPlaceId=edit&&edit.place_id?edit.place_id:null;state.selectedTags=new Set();state.imageKey=edit&&edit.image_key?edit.image_key:null;document.getElementById("modalTitle").textContent=edit?"Update Item":"Add Item";document.getElementById("itemName").value=edit&&edit.name?edit.name:"";var notesEl=document.getElementById("itemNotes");notesEl.value=edit&&edit.notes?edit.notes:"";document.getElementById("notesCount").textContent=String(notesEl.value.length);document.getElementById("photoPreview").classList.remove("show");document.getElementById("photoInput").value="";if(edit&&edit.image_url){var p=document.getElementById("photoPreview");p.src=edit.image_url;p.classList.add("show")}if(edit&&edit.tags){edit.tags.forEach(function(n){if((n||"").toLowerCase()==="uncategorized")return;var f=state.tags.find(function(t){return t.name===n});if(f&&state.selectedTags.size<MAX_TAGS)state.selectedTags.add(f.id)})}renderPlaceChips();renderTagChips();document.getElementById("modal").classList.add("open")}
 function closeModal(){document.getElementById("modal").classList.remove("open");state.editingId=null;state.imageKey=null}
@@ -326,7 +329,7 @@ document.getElementById("cancelBtn").addEventListener("click",closeModal);
 document.getElementById("modal").addEventListener("click",function(e){if(e.target.id==="modal")closeModal()});
 document.getElementById("categories").addEventListener("click",function(e){if(e.target.classList.contains("cat-chip")){state.currentTag=e.target.getAttribute("data-cat");state.page=1;renderCategories();fetchItems()}});
 document.getElementById("search").addEventListener("input",debounce(function(e){state.search=e.target.value.trim();state.page=1;fetchItems()},350));
-document.getElementById("grid").addEventListener("click",function(e){var del=e.target.closest(".delete-btn");if(del){openConfirmDelete(parseInt(del.getAttribute("data-id"),10),del.getAttribute("data-name")||"this item");return}var edit=e.target.closest(".edit-btn");if(edit){var id=parseInt(edit.getAttribute("data-id"),10);openModal(state.items.find(function(i){return i.id===id}))}});
+document.getElementById("grid").addEventListener("click",function(e){var del=e.target.closest(".delete-btn");if(del){openConfirmDelete(parseInt(del.getAttribute("data-id"),10),del.getAttribute("data-name")||"this item");return}var edit=e.target.closest(".edit-btn");if(edit){var id=parseInt(edit.getAttribute("data-id"),10);openModal(state.items.find(function(i){return i.id===id}));return}var card=e.target.closest(".card");if(card){document.querySelectorAll(".card.expanded").forEach(function(c){if(c!==card)c.classList.remove("expanded")});card.classList.toggle("expanded")}});
 document.getElementById("pagination").addEventListener("click",function(e){if(e.target.id==="prevPage"&&state.page>1){state.page--;fetchItems()}if(e.target.id==="nextPage"&&state.page<state.totalPages){state.page++;fetchItems()}});
 document.getElementById("placeChips").addEventListener("click",function(e){if(e.target.classList.contains("chip")){var id=parseInt(e.target.getAttribute("data-id"),10);state.selectedPlaceId=state.selectedPlaceId===id?null:id;renderPlaceChips()}});
 document.getElementById("tagChips").addEventListener("click",function(e){if(!e.target.classList.contains("chip")||e.target.classList.contains("disabled"))return;var id=parseInt(e.target.getAttribute("data-id"),10);if(state.selectedTags.has(id)){state.selectedTags.delete(id)}else if(state.selectedTags.size<MAX_TAGS){state.selectedTags.add(id)}else{toast("Maximum "+MAX_TAGS+" tags");return}renderTagChips()});
