@@ -6,7 +6,7 @@ pages_build_output_dir = "public"
 [[d1_databases]]
 binding = "DB"
 database_name = "myitem-db"
-database_id = "REPLACE_WITH_YOUR_D1_ID"  # Fill this after creating D1
+database_id = "6d578ae1-ff99-45fb-80b2-d0c486c8356f"
 
 [[r2_buckets]]
 binding = "IMAGES"
