@@ -77,14 +77,50 @@ export async function onRequest(context) {
       const res = await env.DB.prepare("INSERT INTO tags (name, user_id) VALUES (?, ?) RETURNING *").bind(name.trim(), uid).first();
       return json(res, corsHeaders, 201);
     }
+    if (path.startsWith("/places/") && method === "PUT") {
+      const id = path.split("/")[2];
+      const { name } = await request.json();
+      if (!name) return error("Name required", 400, corsHeaders);
+      await env.DB.prepare("UPDATE places SET name = ? WHERE id = ? AND user_id = ?").bind(name.trim(), id, uid).run();
+      return json({ success: true }, corsHeaders);
+    }
+    if (path.startsWith("/places/") && method === "DELETE") {
+      const id = path.split("/")[2];
+      await env.DB.prepare("UPDATE items SET place_id = NULL, updated_at = datetime('now') WHERE place_id = ? AND user_id = ?").bind(id, uid).run();
+      await env.DB.prepare("DELETE FROM places WHERE id = ? AND user_id = ?").bind(id, uid).run();
+      return json({ success: true }, corsHeaders);
+    }
+
+    if (path.startsWith("/tags/") && method === "PUT") {
+      const id = path.split("/")[2];
+      const { name } = await request.json();
+      if (!name) return error("Name required", 400, corsHeaders);
+      const oldTag = await env.DB.prepare("SELECT name FROM tags WHERE id = ? AND user_id = ?").bind(id, uid).first();
+      await env.DB.prepare("UPDATE tags SET name = ? WHERE id = ? AND user_id = ?").bind(name.trim(), id, uid).run();
+      if (oldTag) {
+        await env.DB.prepare("UPDATE items SET category = ?, updated_at = datetime('now') WHERE category = ? AND user_id = ?").bind(name.trim(), oldTag.name, uid).run();
+      }
+      return json({ success: true }, corsHeaders);
+    }
     if (path.startsWith("/tags/") && method === "DELETE") {
       const id = path.split("/")[2];
+      
+      const uncat = await env.DB.prepare("SELECT id FROM tags WHERE LOWER(name) = 'uncategorized' AND user_id = ?").bind(uid).first();
+      let uncatId = uncat?.id;
+      if (!uncatId) {
+         const res = await env.DB.prepare("INSERT INTO tags (name, user_id) VALUES ('Uncategorized', ?) RETURNING id").bind(uid).first();
+         uncatId = res.id;
+      }
+      
       const { results: linked } = await env.DB.prepare("SELECT item_id FROM item_tags WHERE tag_id = ? AND item_id IN (SELECT id FROM items WHERE user_id = ?)").bind(id, uid).all();
       for (const row of linked) {
         const itemId = row.item_id;
+        const cnt = await env.DB.prepare("SELECT COUNT(*) as c FROM item_tags WHERE item_id = ?").bind(itemId).first();
         await env.DB.prepare("DELETE FROM item_tags WHERE item_id = ? AND tag_id = ?").bind(itemId, id).run();
-        // Fallback to Uncategorized logic simplified for multi-user:
-        await env.DB.prepare("UPDATE items SET category = 'Uncategorized', updated_at = datetime('now') WHERE id = ?").bind(itemId).run();
+        if (cnt.c <= 1) {
+          await env.DB.prepare("INSERT OR IGNORE INTO item_tags (item_id, tag_id) VALUES (?, ?)").bind(itemId, uncatId).run();
+          await env.DB.prepare("UPDATE items SET category = 'Uncategorized', updated_at = datetime('now') WHERE id = ? AND user_id = ?").bind(itemId, uid).run();
+        }
       }
       await env.DB.prepare("DELETE FROM tags WHERE id = ? AND user_id = ?").bind(id, uid).run();
       return json({ success: true }, corsHeaders);
