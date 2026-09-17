@@ -1,0 +1,16 @@
+name = "myitem"
+compatibility_date = "2025-09-01"
+pages_build_output_dir = "public"
+
+# For local development / Workers
+[[d1_databases]]
+binding = "DB"
+database_name = "myitem-db"
+database_id = "REPLACE_WITH_YOUR_D1_ID"  # Fill this after creating D1
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "myitem-images"
+
+# Optional: for full Worker if you prefer instead of Pages Functions
+# main = "src/worker.js"
