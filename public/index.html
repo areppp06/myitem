@@ -1,1 +1,355 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>MyItem – Find Your Stuff Fast</title>
+<meta name="theme-color" content="#0058A3"/>
+<link rel="icon" type="image/png" href="/api/images/8d720093-a322-4ab7-883c-6e938f9823b3.jpg"/>
+<link rel="icon" type="image/svg+xml" href="/logo-icon.svg"/>
+<link rel="apple-touch-icon" href="/api/images/d1248757-9f72-46bd-aa4a-f8489bfe61c2.jpg"/>
+<style>
+:root{
+  --ikea-yellow:#FFDA1A;
+  --ikea-blue:#0058A3;
+  --ikea-blue-dark:#003d73;
+  --bg:#f4f6f8;
+  --card:#fff;
+  --text:#1a1a1a;
+  --muted:#6b7280;
+  --border:#e5e7eb;
+  --radius:14px;
+  --shadow:0 2px 10px rgba(0,0,0,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
+  background:var(--bg);color:var(--text);min-height:100vh;
+}
+header{
+  background:var(--ikea-blue);
+  color:#fff;
+  padding:12px 20px;
+  position:sticky;top:0;z-index:50;
+  box-shadow:0 2px 12px rgba(0,0,0,.18);
+  display:flex;align-items:center;gap:16px;
+}
+.logo{
+  font-weight:800;font-size:1.35rem;letter-spacing:-.6px;
+  display:flex;align-items:center;flex-shrink:0;text-decoration:none;
+}
+.logo-img{height:36px;width:auto;display:block}
+.logo .my{color:#fff}
+.logo .item{color:var(--ikea-yellow)}
+.search-wrap{
+  flex:1;max-width:480px;position:relative;margin:0 auto;
+}
+#search{
+  width:100%;padding:10px 14px 10px 40px;
+  border:none;border-radius:999px;font-size:15px;
+  background:#fff;color:#111;outline:none;
+  box-shadow:0 1px 4px rgba(0,0,0,.1);
+}
+.search-icon{
+  position:absolute;left:12px;top:50%;transform:translateY(-50%);
+  display:flex;align-items:center;color:#9ca3af;pointer-events:none;
+}
+.header-actions{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;margin-left:auto;
+}
+.btn-manage{
+  background:transparent;border:1.5px solid rgba(255,255,255,.45);
+  color:#fff;padding:8px 14px;border-radius:8px;
+  font-weight:600;font-size:.85rem;cursor:pointer;text-decoration:none;
+  transition:background .15s,border-color .15s;
+}
+.btn-manage:hover{background:rgba(255,255,255,.12);border-color:#fff}
+.btn-add{
+  background:var(--ikea-yellow);color:var(--ikea-blue);
+  padding:8px 16px;border-radius:8px;border:none;
+  font-weight:700;font-size:.85rem;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  transition:transform .1s,box-shadow .15s;
+}
+.btn-add:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.btn-add:active{transform:translateY(0)}
+.pfp{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.2);
+  border:2px solid rgba(255,255,255,.5);
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.85);cursor:default;flex-shrink:0;
+}
+.categories-wrap{
+  background:#fff;border-bottom:1px solid var(--border);
+  padding:12px 20px 8px;
+}
+.categories{
+  display:flex;gap:8px;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding-bottom:4px;
+}
+.categories::-webkit-scrollbar{display:none}
+.cat-chip{
+  flex-shrink:0;padding:7px 14px;border-radius:999px;
+  border:1.5px solid var(--border);background:#fff;
+  font-weight:600;font-size:.85rem;cursor:pointer;
+  color:var(--text);transition:all .15s;
+}
+.cat-chip:hover{border-color:var(--ikea-blue);color:var(--ikea-blue)}
+.cat-chip.active{
+  background:var(--ikea-yellow);border-color:var(--ikea-yellow);
+  color:var(--ikea-blue);
+}
+.filter-meta{
+  font-size:.8rem;color:var(--muted);margin-top:8px;
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.filter-meta strong{color:var(--text);font-weight:700}
+.filter-meta .filter-tag{
+  background:#eef5ff;color:var(--ikea-blue);
+  padding:2px 8px;border-radius:6px;font-weight:600;font-size:.75rem;
+}
+.container{max-width:1200px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+@media(min-width:600px){.grid{grid-template-columns:repeat(3,1fr);gap:16px}}
+@media(min-width:900px){.grid{grid-template-columns:repeat(4,1fr);gap:18px}}
+.card{
+  background:var(--card);border-radius:var(--radius);
+  overflow:hidden;box-shadow:var(--shadow);
+  border:1px solid var(--border);
+  display:flex;flex-direction:column;
+  transition:box-shadow .15s,transform .15s;
+}
+.card:hover{box-shadow:0 6px 20px rgba(0,0,0,.1);transform:translateY(-2px)}
+.thumb-wrap{position:relative;width:100%;aspect-ratio:1;background:#eef0f2}
+.thumb{width:100%;height:100%;object-fit:cover;display:block}
+.thumb.placeholder{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(135deg,#eef0f2,#e0e4e8);
+  color:#b0b8c0;
+}
+.tag-stack{
+  position:absolute;top:8px;left:8px;
+  display:flex;flex-direction:column;gap:4px;
+  max-width:calc(100% - 16px);z-index:2;
+}
+.tag-badge{
+  background:rgba(0,88,163,.9);color:#fff;
+  padding:3px 8px;border-radius:6px;
+  font-size:.68rem;font-weight:600;
+  backdrop-filter:blur(4px);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  max-width:100%;
+  box-shadow:0 1px 4px rgba(0,0,0,.2);
+}
+.tag-badge .dot{margin-right:3px;opacity:.8}
+.card-body{padding:12px 14px 14px;display:flex;flex-direction:column;flex:1}
+.card-name{
+  font-weight:700;font-size:.95rem;margin-bottom:4px;
+  line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-notes{
+  font-size:.8rem;color:var(--muted);line-height:1.4;
+  margin-bottom:10px;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.card-notes:empty{display:none}
+.card-divider{height:1px;background:var(--border);margin:0 0 10px}
+.place-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  background:#f3f4f6;color:#374151;
+  padding:5px 10px;border-radius:8px;
+  font-size:.78rem;font-weight:600;max-width:100%;
+}
+.place-chip svg{flex-shrink:0;opacity:.7}
+.place-chip .place-deleted{color:#c00;font-weight:700}
+.card-footer{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-top:auto;padding-top:10px;gap:8px;
+}
+.card-date{font-size:.72rem;color:var(--muted)}
+.card-actions{display:flex;gap:6px}
+.btn-sm{
+  padding:5px 10px;border-radius:6px;border:none;
+  font-weight:700;font-size:.75rem;cursor:pointer;
+}
+.btn-update{background:var(--ikea-yellow);color:var(--ikea-blue)}
+.btn-del{background:#fff;border:1.5px solid #fecaca;color:#c00;padding:5px 8px}
+.pagination{
+  display:flex;justify-content:center;align-items:center;gap:12px;
+  margin-top:28px;padding:12px;
+}
+.page-info{font-weight:600;color:var(--muted);font-size:.9rem}
+.btn-page{
+  background:#fff;border:1.5px solid var(--border);color:#333;
+  padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;cursor:pointer;
+}
+.btn-page:disabled{opacity:.4;cursor:not-allowed}
+.btn-page:not(:disabled):hover{border-color:var(--ikea-blue);color:var(--ikea-blue)}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);grid-column:1/-1}
+.empty h3{font-size:1.1rem;margin-bottom:6px;color:var(--text)}
+.loading{text-align:center;padding:48px;color:var(--muted);grid-column:1/-1}
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:100;
+  display:none;align-items:flex-end;justify-content:center;
+}
+@media(min-width:600px){.modal-overlay{align-items:center}}
+.modal-overlay.open{display:flex}
+.modal{
+  background:#fff;width:100%;max-width:480px;
+  border-radius:20px 20px 0 0;padding:24px 20px 28px;
+  max-height:90vh;overflow-y:auto;
+}
+@media(min-width:600px){.modal{border-radius:16px}}
+.modal h2{font-size:1.25rem;margin-bottom:18px;color:var(--ikea-blue)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:#444}
+.form-group input,.form-group textarea{
+  width:100%;padding:12px 14px;border:2px solid #e0e0e0;border-radius:10px;
+  font-size:16px;outline:none;font-family:inherit;
+}
+.form-group input:focus,.form-group textarea:focus{border-color:var(--ikea-blue)}
+textarea#itemNotes{resize:vertical;min-height:72px}
+.char-count{font-size:.75rem;color:#888;text-align:right;margin-top:4px}
+.photo-preview{width:120px;height:120px;border-radius:12px;object-fit:cover;background:#f0f0f0;display:none;margin-bottom:8px}
+.photo-preview.show{display:block}
+.chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.chip{padding:6px 12px;border-radius:999px;background:#f0f0f0;font-size:.85rem;cursor:pointer;border:2px solid transparent}
+.chip.selected{background:#e0f0ff;border-color:var(--ikea-blue);color:var(--ikea-blue);font-weight:600}
+.chip.disabled{opacity:.4;cursor:not-allowed}
+.add-new{color:var(--ikea-blue);font-weight:600;cursor:pointer;font-size:.9rem;margin-top:6px;display:inline-block}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn{flex:1;padding:14px;border-radius:10px;border:none;font-weight:700;font-size:.9rem;cursor:pointer}
+.btn-outline{background:#f3f4f6;color:#333}
+.btn-primary{background:var(--ikea-blue);color:#fff}
+.btn-danger-full{background:#c00;color:#fff}
+.confirm-box{text-align:center;padding:8px 0 4px}
+.confirm-box .confirm-title{font-size:1.15rem;margin-bottom:8px;line-height:1.4}
+.confirm-box .confirm-delete{color:#c00;font-weight:800;font-size:1.2rem}
+.confirm-box .confirm-name{font-weight:800;font-size:1.15rem}
+.toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%);
+  background:#222;color:#fff;padding:12px 22px;border-radius:999px;
+  font-size:.9rem;z-index:200;opacity:0;transition:opacity .3s;pointer-events:none;
+}
+.toast.show{opacity:1}
+@media(max-width:640px){
+  header{padding:10px 12px;gap:10px;flex-wrap:wrap}
+  .logo-img{height:30px}
+  .search-wrap{order:3;flex:1 1 100%;max-width:none;margin-top:4px}
+  .header-actions{gap:8px}
+  .btn-manage{padding:7px 10px;font-size:.8rem}
+  .btn-add{padding:7px 12px;font-size:.8rem}
+  .pfp{width:32px;height:32px}
+  .categories-wrap{padding:10px 12px 6px}
+  .container{padding:14px 12px}
+}
+</style>
+</head>
+<body>
+<header>
+  <a href="/" class="logo" aria-label="MyItem"><img src="/api/images/88fb26bb-bec6-4a7c-8d2a-0033ff74006e.jpg" alt="MyItem" class="logo-img" height="36"/></a>
+  <div class="search-wrap">
+    <span class="search-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="21" y2="21"/></svg>
+    </span>
+    <input type="search" id="search" placeholder="Search items, places..." autocomplete="off"/>
+  </div>
+  <div class="header-actions">
+    <a href="/manage.html" class="btn-manage">Manage</a>
+    <button class="btn-add" id="fab" type="button">+ Add Item</button>
+    <div class="pfp" title="Profile">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    </div>
+  </div>
+</header>
+<div class="categories-wrap">
+  <div class="categories" id="categories"></div>
+  <div class="filter-meta" id="filterMeta"></div>
+</div>
+<div class="container">
+  <div id="grid" class="grid"><div class="loading">Loading your items...</div></div>
+  <div class="pagination" id="pagination" style="display:none"></div>
+</div>
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2 id="modalTitle">Add Item</h2>
+    <div class="form-group"><label>Photo (thumbnail)</label><img id="photoPreview" class="photo-preview" alt="Preview"/><input type="file" id="photoInput" accept="image/*"/></div>
+    <div class="form-group"><label>Name *</label><input type="text" id="itemName" placeholder="e.g. MacBook charger" required/></div>
+    <div class="form-group"><label>Place</label><div class="chip-list" id="placeChips"></div><span class="add-new" id="addPlaceBtn">+ Add new place</span></div>
+    <div class="form-group"><label>Tags (categories) * <span style="font-weight:400;color:#888">max 3</span></label><div class="chip-list" id="tagChips"></div><span class="add-new" id="addTagBtn">+ Create new tag</span><div style="font-size:.8rem;color:#888;margin-top:6px">At least one tag is required (up to 3)</div></div>
+    <div class="form-group"><label>Note</label><textarea id="itemNotes" placeholder="Optional short note..." maxlength="300"></textarea><div class="char-count"><span id="notesCount">0</span>/300</div></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="cancelBtn" type="button">Cancel</button><button class="btn btn-primary" id="saveBtn" type="button">Save Item</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="nameModal">
+  <div class="modal" style="max-width:360px">
+    <h2 id="nameModalTitle">Add</h2>
+    <div class="form-group"><input type="text" id="nameModalInput" placeholder="Name" autocomplete="off"/></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="nameModalCancel" type="button">Cancel</button><button class="btn btn-primary" id="nameModalSave" type="button">Add</button></div>
+  </div>
+</div>
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:360px">
+    <div class="confirm-box"><div class="confirm-title"><span class="confirm-delete">DELETE</span> <span class="confirm-name" id="confirmItemName"></span></div>
+    <p style="color:#666;font-size:.9rem;margin-bottom:18px">This cannot be undone.</p></div>
+    <div class="modal-actions"><button class="btn btn-outline" id="confirmCancel" type="button">Cancel</button><button class="btn btn-danger-full" id="confirmDelete" type="button">Delete</button></div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const API="/api";const MAX_TAGS=3;
+let state={items:[],places:[],tags:[],categories:["All"],currentTag:"All",search:"",page:1,totalPages:1,total:0,editingId:null,selectedPlaceId:null,selectedTags:new Set(),imageKey:null};
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2200)}
+function debounce(fn,ms){let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}}
+function escapeHtml(s){if(!s)return"";return String(s).replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;")}
+function formatDate(iso){if(!iso)return"-";return new Date(iso).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"})}
+async function compressImage(file,maxWidth,quality){maxWidth=maxWidth||500;quality=quality||.75;return new Promise(function(resolve){var rd=new FileReader();rd.onload=function(e){var img=new Image();img.onload=function(){var c=document.createElement("canvas");var w=img.width,h=img.height;if(w>maxWidth){h=(h*maxWidth)/w;w=maxWidth}c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);c.toBlob(function(b){resolve(b)},"image/jpeg",quality)};img.src=e.target.result};rd.readAsDataURL(file)})}
+async function fetchItems(){var p=new URLSearchParams({page:state.page,limit:10});if(state.search)p.set("search",state.search);if(state.currentTag&&state.currentTag!=="All")p.set("tag",state.currentTag);var res=await fetch(API+"/items?"+p);var data=await res.json();state.items=data.items||[];state.totalPages=(data.pagination&&data.pagination.totalPages)||1;state.total=(data.pagination&&data.pagination.total)||0;renderGrid();renderPagination();renderFilterMeta()}
+async function fetchPlaces(){var res=await fetch(API+"/places");state.places=await res.json();renderPlaceChips()}
+async function fetchTags(){var res=await fetch(API+"/tags");state.tags=await res.json();renderTagChips()}
+async function fetchCategories(){var res=await fetch(API+"/categories");var cats=await res.json();state.categories=cats.length?cats:["All"];renderCategories()}
+function renderCategories(){document.getElementById("categories").innerHTML=state.categories.map(function(c){return'<button class="cat-chip '+(c===state.currentTag?"active":"")+'" data-cat="'+escapeHtml(c)+'">'+escapeHtml(c)+"</button>"}).join("")}
+function renderFilterMeta(){var el=document.getElementById("filterMeta");var count=state.total;var label=count===1?"1 item tracked":count+" items tracked";if(state.currentTag&&state.currentTag!=="All"){el.innerHTML="<strong>"+label+"</strong> &mdash; Filtered by: <span class=\"filter-tag\">"+escapeHtml(state.currentTag)+"</span>"}else if(state.search){el.innerHTML="<strong>"+label+"</strong> &mdash; Search: <span class=\"filter-tag\">"+escapeHtml(state.search)+"</span>"}else{el.innerHTML="<strong>"+label+"</strong>"}}
+function renderPlaceChips(){document.getElementById("placeChips").innerHTML=state.places.map(function(p){return'<span class="chip '+(state.selectedPlaceId==p.id?"selected":"")+'" data-id="'+p.id+'">'+escapeHtml(p.name)+"</span>"}).join("")}
+function renderTagChips(){var atMax=state.selectedTags.size>=MAX_TAGS;document.getElementById("tagChips").innerHTML=state.tags.filter(function(t){return(t.name||"").toLowerCase()!=="uncategorized"}).map(function(t){var sel=state.selectedTags.has(t.id);var disabled=atMax&&!sel;return'<span class="chip '+(sel?"selected":"")+(disabled?" disabled":"")+'" data-id="'+t.id+'">'+escapeHtml(t.name)+"</span>"}).join("")}
+function renderGrid(){var grid=document.getElementById("grid");if(!state.items.length){grid.innerHTML='<div class="empty"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>';return}grid.innerHTML=state.items.map(function(item){var img=item.image_url?'<img class="thumb" src="'+item.image_url+'" alt="'+escapeHtml(item.name)+'" loading="lazy"/>':'<div class="thumb placeholder"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></div>';var tags=(item.tags||[]).filter(function(t){return(t||"").toLowerCase()!=="uncategorized"}).slice(0,MAX_TAGS);var tagStack=tags.length?'<div class="tag-stack">'+tags.map(function(t){return'<span class="tag-badge"><span class="dot">&middot;</span>'+escapeHtml(t)+"</span>"}).join("")+"</div>":"";var placeInner=item.place_name?escapeHtml(item.place_name):'<span class="place-deleted">Place deleted</span>, update required';var placeChip='<span class="place-chip"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>'+placeInner+"</span>";var notes=item.notes?'<div class="card-notes">'+escapeHtml(item.notes)+"</div>":"";return'<div class="card" data-id="'+item.id+'"><div class="thumb-wrap">'+img+tagStack+'</div><div class="card-body"><div class="card-name">'+escapeHtml(item.name)+'</div>'+notes+'<div class="card-divider"></div>'+placeChip+'<div class="card-divider" style="margin-top:10px"></div><div class="card-footer"><span class="card-date">'+formatDate(item.updated_at)+'</span><div class="card-actions"><button class="btn-sm btn-update edit-btn" data-id="'+item.id+'">Update</button><button class="btn-sm btn-del delete-btn" data-id="'+item.id+'" data-name="'+escapeHtml(item.name)+'" title="Delete">Del</button></div></div></div></div>'}).join("")}
+function renderPagination(){var el=document.getElementById("pagination");if(state.totalPages<=1){el.style.display="none";return}el.style.display="flex";el.innerHTML='<button class="btn-page" id="prevPage"'+(state.page<=1?" disabled":"")+">Prev</button><span class="page-info">'+state.page+" / "+state.totalPages+'</span><button class="btn-page" id="nextPage"'+(state.page>=state.totalPages?" disabled":"")+">Next</button>"}
+function openModal(edit){state.editingId=edit?edit.id:null;state.selectedPlaceId=edit&&edit.place_id?edit.place_id:null;state.selectedTags=new Set();state.imageKey=edit&&edit.image_key?edit.image_key:null;document.getElementById("modalTitle").textContent=edit?"Update Item":"Add Item";document.getElementById("itemName").value=edit&&edit.name?edit.name:"";var notesEl=document.getElementById("itemNotes");notesEl.value=edit&&edit.notes?edit.notes:"";document.getElementById("notesCount").textContent=notesEl.value.length;document.getElementById("photoPreview").classList.remove("show");document.getElementById("photoInput").value="";if(edit&&edit.image_url){var p=document.getElementById("photoPreview");p.src=edit.image_url;p.classList.add("show")}if(edit&&edit.tags){edit.tags.forEach(function(n){if((n||"").toLowerCase()==="uncategorized")return;var f=state.tags.find(function(t){return t.name===n});if(f&&state.selectedTags.size<MAX_TAGS)state.selectedTags.add(f.id)})}renderPlaceChips();renderTagChips();document.getElementById("modal").classList.add("open")}
+function closeModal(){document.getElementById("modal").classList.remove("open");state.editingId=null;state.imageKey=null}
+document.getElementById("fab").addEventListener("click",function(){openModal(null)});
+document.getElementById("cancelBtn").addEventListener("click",closeModal);
+document.getElementById("modal").addEventListener("click",function(e){if(e.target.id==="modal")closeModal()});
+document.getElementById("categories").addEventListener("click",function(e){if(e.target.classList.contains("cat-chip")){state.currentTag=e.target.dataset.cat;state.page=1;renderCategories();fetchItems()}});
+document.getElementById("search").addEventListener("input",debounce(function(e){state.search=e.target.value.trim();state.page=1;fetchItems()},350));
+document.getElementById("grid").addEventListener("click",function(e){var del=e.target.closest(".delete-btn");if(del){openConfirmDelete(parseInt(del.dataset.id,10),del.dataset.name||"this item");return}var edit=e.target.closest(".edit-btn");if(edit){var id=parseInt(edit.dataset.id,10);openModal(state.items.find(function(i){return i.id===id}))}});
+document.getElementById("pagination").addEventListener("click",function(e){if(e.target.id==="prevPage"&&state.page>1){state.page--;fetchItems()}if(e.target.id==="nextPage"&&state.page<state.totalPages){state.page++;fetchItems()}});
+document.getElementById("placeChips").addEventListener("click",function(e){if(e.target.classList.contains("chip")){var id=parseInt(e.target.dataset.id,10);state.selectedPlaceId=state.selectedPlaceId===id?null:id;renderPlaceChips()}});
+document.getElementById("tagChips").addEventListener("click",function(e){if(!e.target.classList.contains("chip")||e.target.classList.contains("disabled"))return;var id=parseInt(e.target.dataset.id,10);if(state.selectedTags.has(id)){state.selectedTags.delete(id)}else if(state.selectedTags.size<MAX_TAGS){state.selectedTags.add(id)}else{toast("Maximum "+MAX_TAGS+" tags");return}renderTagChips()});
+document.getElementById("photoInput").addEventListener("change",async function(e){var f=e.target.files[0];if(!f)return;var blob=await compressImage(f);var p=document.getElementById("photoPreview");p.src=URL.createObjectURL(blob);p.classList.add("show");p._blob=blob});
+document.getElementById("itemNotes").addEventListener("input",function(e){document.getElementById("notesCount").textContent=e.target.value.length});
+var nameModalMode=null;
+function openNameModal(mode){nameModalMode=mode;document.getElementById("nameModalTitle").textContent=mode==="place"?"New place":"New tag";document.getElementById("nameModalInput").value="";document.getElementById("nameModal").classList.add("open");setTimeout(function(){document.getElementById("nameModalInput").focus()},50)}
+function closeNameModal(){document.getElementById("nameModal").classList.remove("open");nameModalMode=null}
+document.getElementById("addPlaceBtn").addEventListener("click",function(){openNameModal("place")});
+document.getElementById("addTagBtn").addEventListener("click",function(){openNameModal("tag")});
+document.getElementById("nameModalCancel").addEventListener("click",closeNameModal);
+document.getElementById("nameModal").addEventListener("click",function(e){if(e.target.id==="nameModal")closeNameModal()});
+document.getElementById("nameModalInput").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("nameModalSave").click()});
+document.getElementById("nameModalSave").addEventListener("click",async function(){var name=document.getElementById("nameModalInput").value.trim();if(!name){toast("Name is required");return}var btn=document.getElementById("nameModalSave");btn.disabled=true;try{if(nameModalMode==="place"){var res=await fetch(API+"/places",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name})});if(res.ok){var c=await res.json();state.selectedPlaceId=c.id;await fetchPlaces();toast("Place added");closeNameModal()}else{var err=await res.json().catch(function(){return{}});toast(err.error||"Could not add place")}}else if(nameModalMode==="tag"){if(state.selectedTags.size>=MAX_TAGS){toast("Maximum "+MAX_TAGS+" tags");return}var res2=await fetch(API+"/tags",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:name})});if(res2.ok){var t=await res2.json();state.selectedTags.add(t.id);await fetchTags();await fetchCategories();toast("Tag created");closeNameModal()}else{var err2=await res2.json().catch(function(){return{}});toast(err2.error||"Could not create tag")}}}finally{btn.disabled=false}});
+var pendingDeleteId=null;
+function openConfirmDelete(id,name){pendingDeleteId=id;document.getElementById("confirmItemName").textContent=name;document.getElementById("confirmModal").classList.add("open")}
+function closeConfirm(){document.getElementById("confirmModal").classList.remove("open");pendingDeleteId=null}
+document.getElementById("confirmCancel").addEventListener("click",closeConfirm);
+document.getElementById("confirmModal").addEventListener("click",function(e){if(e.target.id==="confirmModal")closeConfirm()});
+document.getElementById("confirmDelete").addEventListener("click",async function(){if(!pendingDeleteId)return;var btn=document.getElementById("confirmDelete");btn.disabled=true;try{var res=await fetch(API+"/items/"+pendingDeleteId,{method:"DELETE"});if(res.ok){toast("Item deleted");closeConfirm();await fetchItems()}else toast("Delete failed")}catch(e){toast("Network error")}finally{btn.disabled=false}});
+document.getElementById("saveBtn").addEventListener("click",async function(){var name=document.getElementById("itemName").value.trim();if(!name){toast("Name is required");return}if(state.selectedTags.size===0){toast("Select at least one tag (category)");return}if(state.selectedTags.size>MAX_TAGS){toast("Maximum "+MAX_TAGS+" tags");return}var saveBtn=document.getElementById("saveBtn");saveBtn.disabled=true;saveBtn.textContent="Saving...";try{var imageKey=state.imageKey;var prev=document.getElementById("photoPreview");if(prev._blob){var form=new FormData();form.append("file",prev._blob,"thumb.jpg");var up=await fetch(API+"/upload",{method:"POST",body:form});if(up.ok){var d=await up.json();imageKey=d.key}}var notes=document.getElementById("itemNotes").value.trim().slice(0,300);var payload={name:name,place_id:state.selectedPlaceId||null,tags:Array.from(state.selectedTags).slice(0,MAX_TAGS),image_key:imageKey,notes:notes||null};var url=state.editingId?API+"/items/"+state.editingId:API+"/items";var method=state.editingId?"PUT":"POST";var res=await fetch(url,{method:method,headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});if(res.ok){toast(state.editingId?"Updated!":"Item added!");closeModal();await fetchCategories();await fetchItems()}else{var err=await res.json();toast(err.error||"Save failed")}}catch(e){console.error(e);toast("Network error")}finally{saveBtn.disabled=false;saveBtn.textContent="Save Item"}});
+async function init(){await Promise.all([fetchPlaces(),fetchTags(),fetchCategories(),fetchItems()])}
+init();
+</script>
+</body>
+</html>
