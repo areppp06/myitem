@@ -16,7 +16,9 @@
     .logo-img { height: 32px; width: auto; display: block; }
     .logo-link { display: flex; align-items: center; }
     .back-link { color: white; text-decoration: none; font-weight: 600; font-size: 0.95rem; }
-    header h1 { margin-left: auto; font-size: 1.1rem; }
+    header h1 { font-size: 1.1rem; }
+    .logout-btn { margin-left: auto; background: none; border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 6px; border-radius: 8px; transition: background 0.2s; }
+    .logout-btn:hover { background: rgba(255,255,255,0.15); }
     .container { max-width: 700px; margin: 0 auto; padding: 20px 16px; }
     .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
     .section h2 { font-size: 1.1rem; color: var(--ikea-blue); margin-bottom: 14px; }
@@ -59,6 +61,13 @@
     <a href="/" class="back-link">Back</a>
     <a href="/" class="logo-link"><img src="/api/images/88fb26bb-bec6-4a7c-8d2a-0033ff74006e.jpg" alt="MyItem" class="logo-img"/></a>
     <h1>Manage</h1>
+    <button onclick="logout()" class="logout-btn" title="Logout">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+        <polyline points="16 17 21 12 16 7"></polyline>
+        <line x1="21" y1="12" x2="9" y2="12"></line>
+      </svg>
+    </button>
   </header>
   <div class="container">
     <div class="section">
@@ -103,8 +112,14 @@
   <script>
     const API = "/api";
 
+
 let idToken = localStorage.getItem("google_id_token");
+function logout() {
+  localStorage.removeItem("google_id_token");
+  window.location.href = "/";
+}
 if (!idToken) {
+
   window.location.href = "/";
 }
 
