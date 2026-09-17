@@ -58,10 +58,10 @@ export async function onRequest(context) {
     }
 
     // ========== ITEMS ==========
-    // GET /api/items?search=&category=&page=1&limit=10
+    // GET /api/items?search=&tag=&page=1&limit=10
     if (path === "/items" && method === "GET") {
       const search = url.searchParams.get("search") || "";
-      const category = url.searchParams.get("category") || "";
+      const tag = url.searchParams.get("tag") || "";
       const page = Math.max(1, parseInt(url.searchParams.get("page") || "1"));
       const limit = Math.min(50, parseInt(url.searchParams.get("limit") || "10"));
       const offset = (page - 1) * limit;
@@ -81,9 +81,14 @@ export async function onRequest(context) {
         const s = `%${search}%`;
         params.push(s, s, s);
       }
-      if (category && category !== "All") {
-        query += ` AND i.category = ?`;
-        params.push(category);
+      // Filter by tag name (tags are the categories)
+      if (tag && tag !== "All") {
+        query += ` AND EXISTS (
+          SELECT 1 FROM item_tags it2
+          JOIN tags t2 ON t2.id = it2.tag_id
+          WHERE it2.item_id = i.id AND t2.name = ?
+        )`;
+        params.push(tag);
       }
 
       // Count total
@@ -127,8 +132,17 @@ export async function onRequest(context) {
     // POST /api/items  (create)
     if (path === "/items" && method === "POST") {
       const body = await request.json();
-      const { name, place_id, category, tags = [], image_key, notes } = body;
+      const { name, place_id, tags = [], image_key, notes } = body;
       if (!name) return error("Name is required", 400, corsHeaders);
+      if (!tags || tags.length === 0) {
+        return error("At least one tag (category) is required", 400, corsHeaders);
+      }
+
+      // Use first tag name as category for simple display fallback
+      const firstTag = await env.DB.prepare("SELECT name FROM tags WHERE id = ?")
+        .bind(tags[0])
+        .first();
+      const categoryName = firstTag?.name || "General";
 
       const result = await env.DB.prepare(
         `INSERT INTO items (name, place_id, category, image_key, notes, updated_at)
@@ -137,21 +151,19 @@ export async function onRequest(context) {
         .bind(
           name.trim(),
           place_id || null,
-          category || "Uncategorized",
+          categoryName,
           image_key || null,
           notes || null
         )
         .first();
 
       // Attach tags
-      if (tags.length > 0) {
-        for (const tagId of tags) {
-          await env.DB.prepare(
-            "INSERT OR IGNORE INTO item_tags (item_id, tag_id) VALUES (?, ?)"
-          )
-            .bind(result.id, tagId)
-            .run();
-        }
+      for (const tagId of tags) {
+        await env.DB.prepare(
+          "INSERT OR IGNORE INTO item_tags (item_id, tag_id) VALUES (?, ?)"
+        )
+          .bind(result.id, tagId)
+          .run();
       }
 
       return json(result, corsHeaders, 201);
@@ -161,7 +173,16 @@ export async function onRequest(context) {
     if (path.startsWith("/items/") && method === "PUT") {
       const id = path.split("/")[2];
       const body = await request.json();
-      const { name, place_id, category, tags = [], image_key, notes } = body;
+      const { name, place_id, tags = [], image_key, notes } = body;
+
+      if (!tags || tags.length === 0) {
+        return error("At least one tag (category) is required", 400, corsHeaders);
+      }
+
+      const firstTag = await env.DB.prepare("SELECT name FROM tags WHERE id = ?")
+        .bind(tags[0])
+        .first();
+      const categoryName = firstTag?.name || "General";
 
       await env.DB.prepare(
         `UPDATE items SET 
@@ -173,7 +194,7 @@ export async function onRequest(context) {
         .bind(
           name?.trim(),
           place_id || null,
-          category || "Uncategorized",
+          categoryName,
           image_key || null,
           notes || null,
           id
@@ -184,14 +205,12 @@ export async function onRequest(context) {
       await env.DB.prepare("DELETE FROM item_tags WHERE item_id = ?")
         .bind(id)
         .run();
-      if (tags.length > 0) {
-        for (const tagId of tags) {
-          await env.DB.prepare(
-            "INSERT OR IGNORE INTO item_tags (item_id, tag_id) VALUES (?, ?)"
-          )
-            .bind(id, tagId)
-            .run();
-        }
+      for (const tagId of tags) {
+        await env.DB.prepare(
+          "INSERT OR IGNORE INTO item_tags (item_id, tag_id) VALUES (?, ?)"
+        )
+          .bind(id, tagId)
+          .run();
       }
 
       const updated = await env.DB.prepare(
@@ -249,12 +268,12 @@ export async function onRequest(context) {
       return new Response(object.body, { headers });
     }
 
-    // ========== CATEGORIES (distinct from items) ==========
+    // ========== CATEGORIES (now powered by tags) ==========
     if (path === "/categories" && method === "GET") {
       const { results } = await env.DB.prepare(
-        "SELECT DISTINCT category FROM items WHERE category IS NOT NULL AND category != '' ORDER BY category"
+        "SELECT name FROM tags ORDER BY name ASC"
       ).all();
-      const cats = results.map((r) => r.category);
+      const cats = results.map((r) => r.name);
       return json(["All", ...cats], corsHeaders);
     }
 
