@@ -47,9 +47,7 @@
     <div class="flex items-center justify-between h-16 gap-4">
       <div class="flex items-center space-x-3 shrink-0">
         <a class="flex items-center gap-2.5 group" href="/">
-          <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-sky-500 flex items-center justify-center shadow-sm text-white font-bold text-lg group-hover:scale-105 transition-transform">
-            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
-          </div>
+          <img src="/api/images/88fb26bb-bec6-4a7c-8d2a-0033ff74006e.jpg" alt="MyItem Logo" class="h-9 w-auto rounded-xl object-cover group-hover:scale-105 transition-transform shadow-sm" />
           <div class="hidden sm:flex items-baseline">
             <span class="text-xl font-bold tracking-tight text-slate-900">My<span class="text-brand-600">Item</span></span>
             <span class="w-1.5 h-1.5 rounded-full bg-brand-accent ml-0.5 inline-block"></span>
@@ -274,7 +272,7 @@ function renderPagination(){
   el.innerHTML=`<button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 ${prevDis}" id="prevPage">Prev</button>
   <span class="text-sm font-semibold text-slate-500">${state.page} / ${state.totalPages}</span>
   <button class="px-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 ${nextDis}" id="nextPage">Next</button>`;
-}el.style.display="flex";var prevDis=state.page<=1?" disabled":"";var nextDis=state.page>=state.totalPages?" disabled":"";el.innerHTML="<button class=\"btn-page\" id=\"prevPage\""+prevDis+">Prev</button><span class=\"page-info\">"+state.page+" / "+state.totalPages+"</span><button class=\"btn-page\" id=\"nextPage\""+nextDis+">Next</button>"}
+}
 function openModal(edit){state.editingId=edit?edit.id:null;state.selectedPlaceId=edit&&edit.place_id?edit.place_id:null;state.selectedTags=new Set();state.imageKey=edit&&edit.image_key?edit.image_key:null;document.getElementById("modalTitle").textContent=edit?"Update Item":"Add Item";document.getElementById("itemName").value=edit&&edit.name?edit.name:"";var notesEl=document.getElementById("itemNotes");notesEl.value=edit&&edit.notes?edit.notes:"";document.getElementById("notesCount").textContent=String(notesEl.value.length);document.getElementById("photoPreview").classList.remove("show");document.getElementById("photoInput").value="";if(edit&&edit.image_url){var p=document.getElementById("photoPreview");p.src=edit.image_url;p.classList.add("show")}if(edit&&edit.tags){edit.tags.forEach(function(n){if((n||"").toLowerCase()==="uncategorized")return;var f=state.tags.find(function(t){return t.name===n});if(f&&state.selectedTags.size<MAX_TAGS)state.selectedTags.add(f.id)})}renderPlaceChips();renderTagChips();document.getElementById("modal").classList.add("open")}
 function closeModal(){document.getElementById("modal").classList.remove("open");state.editingId=null;state.imageKey=null}
 document.getElementById("fab").addEventListener("click",function(){openModal(null)});
