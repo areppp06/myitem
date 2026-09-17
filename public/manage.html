@@ -46,6 +46,8 @@
       font-size: 1.1rem;
       color: var(--ikea-blue);
       margin-bottom: 14px;
+      display: flex;
+      align-items: center;
     }
     .list { list-style: none; }
     .list li {
@@ -90,13 +92,19 @@
 </head>
 <body>
   <header>
-    <a href="/">← Back</a>
+    <a href="/">Back</a>
     <h1>Manage Places & Tags</h1>
   </header>
 
   <div class="container">
     <div class="section">
-      <h2>📍 Places</h2>
+      <h2>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+          <circle cx="12" cy="10" r="3"></circle>
+        </svg>
+        Places
+      </h2>
       <ul class="list" id="placeList"><li class="empty">Loading...</li></ul>
       <div class="add-row">
         <input type="text" id="newPlace" placeholder="New place name" />
@@ -105,7 +113,13 @@
     </div>
 
     <div class="section">
-      <h2>🏷️ Tags</h2>
+      <h2>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px">
+          <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+          <line x1="7" y1="7" x2="7.01" y2="7"></line>
+        </svg>
+        Tags
+      </h2>
       <ul class="list" id="tagList"><li class="empty">Loading...</li></ul>
       <div class="add-row">
         <input type="text" id="newTag" placeholder="New tag name" />
@@ -183,11 +197,8 @@
       if (!e.target.classList.contains("btn-del")) return;
       const id = e.target.dataset.id;
       const type = e.target.dataset.type;
-      // Note: simple delete - in production add cascade care
       if (!confirm(`Delete this ${type}?`)) return;
-      // For now we only support soft or just remove (API doesn't have delete endpoints yet for places/tags to keep simple)
-      // You can extend the API later. For MVP we just hide the button effect.
-      alert("Delete for places/tags coming in next version. For now just leave them – they don't hurt.");
+      alert("Delete for places/tags coming in next version. For now just leave them.");
     });
 
     loadPlaces();
