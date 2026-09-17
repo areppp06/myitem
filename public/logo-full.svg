@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" fill="none">
+  <path d="M12 58 L48 76 L84 58 L84 92 L48 110 L12 92 Z" fill="#0058A3"/>
+  <path d="M48 76 L48 110" stroke="#003d73" stroke-width="1.5"/>
+  <path d="M12 58 L48 40 L48 76 L12 58 Z" fill="#FFDA1A"/>
+  <path d="M84 58 L48 40 L48 76 L84 58 Z" fill="#FFDA1A"/>
+  <path d="M48 14 C38 14 32 22 32 30 C32 44 48 60 48 60 C48 60 64 44 64 30 C64 22 58 14 48 14 Z" fill="#0058A3"/>
+  <circle cx="48" cy="28" r="8" fill="#FFDA1A"/>
+  <path d="M70 18 L76 12 M74 24 L82 22 M68 10 L72 5" stroke="#FFDA1A" stroke-width="3.5" stroke-linecap="round"/>
+  <text x="100" y="78" font-family="Arial Rounded MT Bold, Arial Black, Helvetica Neue, Helvetica, sans-serif" font-size="64" font-weight="800" letter-spacing="-1">
+    <tspan fill="#0058A3">My</tspan><tspan fill="#FFDA1A">Item</tspan>
+  </text>
+</svg>
