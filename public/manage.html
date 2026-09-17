@@ -102,6 +102,24 @@
   <div class="toast" id="toast"></div>
   <script>
     const API = "/api";
+
+let idToken = localStorage.getItem("google_id_token");
+if (!idToken) {
+  window.location.href = "/";
+}
+
+async function apiFetch(path, options = {}) {
+  options.headers = options.headers || {};
+  options.headers["Authorization"] = "Bearer " + idToken;
+  const res = await fetch(API + path, options);
+  if (res.status === 401) {
+    localStorage.removeItem("google_id_token");
+    window.location.href = "/";
+    throw new Error("Unauthorized");
+  }
+  return res;
+}
+
     let renameTarget = null, deleteTarget = null;
     function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
     function isUncategorized(name) { return (name || "").toLowerCase() === "uncategorized"; }
@@ -109,13 +127,13 @@
     const trash = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`;
     function esc(s) { return (s || "").replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;"); }
     async function loadPlaces() {
-      const places = await (await fetch(`${API}/places`)).json();
+      const places = await (await apiFetch(`/places`)).json();
       const el = document.getElementById("placeList");
       if (!places.length) { el.innerHTML = `<li class="empty">No places yet</li>`; return; }
       el.innerHTML = places.map(p => `<li><span class="name">${esc(p.name)}</span><div class="actions"><button class="btn btn-icon" data-action="rename" data-type="place" data-id="${p.id}" data-name="${esc(p.name)}" title="Rename">${pencil}</button><button class="btn btn-del" data-action="delete" data-type="place" data-id="${p.id}" data-name="${esc(p.name)}" title="Delete">${trash}</button></div></li>`).join("");
     }
     async function loadTags() {
-      const tags = await (await fetch(`${API}/tags`)).json();
+      const tags = await (await apiFetch(`/tags`)).json();
       const el = document.getElementById("tagList");
       if (!tags.length) { el.innerHTML = `<li class="empty">No tags yet</li>`; return; }
       el.innerHTML = tags.map(t => {
@@ -125,13 +143,13 @@
     }
     document.getElementById("addPlace").addEventListener("click", async () => {
       const name = document.getElementById("newPlace").value.trim(); if (!name) return;
-      const res = await fetch(`${API}/places`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      const res = await apiFetch(`/places`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
       if (res.ok) { document.getElementById("newPlace").value = ""; toast("Place added"); loadPlaces(); }
       else { const err = await res.json().catch(() => ({})); toast(err.error || "Failed"); }
     });
     document.getElementById("addTag").addEventListener("click", async () => {
       const name = document.getElementById("newTag").value.trim(); if (!name) return;
-      const res = await fetch(`${API}/tags`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      const res = await apiFetch(`/tags`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
       if (res.ok) { document.getElementById("newTag").value = ""; toast("Tag added"); loadTags(); }
       else { const err = await res.json().catch(() => ({})); toast(err.error || "Failed"); }
     });
@@ -161,7 +179,7 @@
       if (!renameTarget) return;
       const name = document.getElementById("renameInput").value.trim(); if (!name) { toast("Name required"); return; }
       const path = renameTarget.type === "place" ? "places" : "tags";
-      const res = await fetch(`${API}/${path}/${renameTarget.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      const res = await apiFetch(`/${path}/${renameTarget.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
       if (res.ok) { toast("Renamed"); document.getElementById("renameModal").classList.remove("open"); renameTarget = null; loadPlaces(); loadTags(); }
       else { const err = await res.json().catch(() => ({})); toast(err.error || "Rename failed"); }
     });
@@ -170,7 +188,7 @@
     document.getElementById("deleteConfirm").addEventListener("click", async () => {
       if (!deleteTarget) return;
       const path = deleteTarget.type === "place" ? "places" : "tags";
-      const res = await fetch(`${API}/${path}/${deleteTarget.id}`, { method: "DELETE" });
+      const res = await apiFetch(`/${path}/${deleteTarget.id}`, { method: "DELETE" });
       if (res.ok) { toast("Deleted"); document.getElementById("deleteModal").classList.remove("open"); deleteTarget = null; loadPlaces(); loadTags(); }
       else { const err = await res.json().catch(() => ({})); toast(err.error || "Delete failed"); }
     });
