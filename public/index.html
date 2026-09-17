@@ -300,7 +300,14 @@ function renderTagChips(){
 function renderGrid(){
   var grid=document.getElementById("grid");
   if(!state.items.length){
-    grid.innerHTML="<div class=\"col-span-full text-center py-12 text-slate-500\"><h3>No items yet</h3><p>Click + Add Item to start organizing.</p></div>";
+    grid.innerHTML=`<div class="col-span-full text-center py-16 text-slate-500 flex flex-col items-center">
+      <h3 class="text-lg font-semibold text-slate-700 mb-1">No items yet</h3>
+      <p class="text-sm mb-6">Click below to start organizing your space.</p>
+      <button onclick="openModal(null)" class="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-brand-600 text-white font-medium hover:bg-brand-700 transition shadow-sm hover:shadow">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+        Add Item
+      </button>
+    </div>`;
     return;
   }
   var pencil=`<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
