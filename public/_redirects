@@ -1,0 +1,3 @@
+# Serve manage without a 302 so Safari + service worker do not choke on redirects
+/manage    /manage.html   200
+/manage/   /manage.html   200
