@@ -13,13 +13,19 @@
       "src": "https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
     }
   ]
 }
