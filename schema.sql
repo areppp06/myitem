@@ -56,3 +56,17 @@ INSERT OR IGNORE INTO tags (name) VALUES
   ('Keys'), 
   ('Charger'), 
   ('Important');
+
+-- Audit log (per-user activity)
+CREATE TABLE IF NOT EXISTS audit_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id TEXT NOT NULL,
+  action TEXT NOT NULL,
+  entity_type TEXT,
+  entity_id INTEGER,
+  entity_name TEXT,
+  summary TEXT NOT NULL,
+  details TEXT,
+  created_at TEXT DEFAULT (datetime('now'))
+);
+CREATE INDEX IF NOT EXISTS idx_audit_user_created ON audit_logs(user_id, created_at);
