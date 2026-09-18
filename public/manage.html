@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Manage – MyItem</title>
+  <meta name="theme-color" content="#0058A3" />
+  <link rel="icon" type="image/png" href="https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png"/>
+  <link rel="apple-touch-icon" href="https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png"/>
+  <link rel="manifest" href="/manifest.webmanifest"/>
+  <style>
+    :root { --ikea-yellow: #FFDA1A; --ikea-blue: #0058A3; --bg: #f5f5f5; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: #111; min-height: 100vh; }
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(226, 232, 240, 0.9);
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      display: flex; align-items: center; padding: 0 24px; height: 64px; gap: 16px;
+      color: #0f172a;
+    }
+    .header-inner { display: flex; width: 100%; max-width: 1200px; margin: 0 auto; align-items: center; justify-content: space-between; }
+    .logo-img { height: 36px; width: 36px; border-radius: 12px; object-fit: cover; transition: transform 0.2s; }
+    .logo-link:hover .logo-img { transform: scale(1.05); }
+    .logout-btn { background: #f8fafc; border: 1px solid #e2e8f0; color: #64748b; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 8px; border-radius: 99px; transition: all 0.2s; }
+    .logout-btn:hover { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
+    .manage-layout { display: flex; max-width: 900px; margin: 20px auto; padding: 0 16px; gap: 24px; align-items: flex-start; }
+    .sidebar { width: 220px; flex-shrink: 0; }
+    .sidebar-nav { list-style: none; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .sidebar-nav li { border-bottom: 1px solid #eee; }
+    .sidebar-nav li:last-child { border-bottom: none; }
+    .sidebar-nav button { width: 100%; text-align: left; background: none; border: none; padding: 14px 20px; font-size: 1rem; color: #555; cursor: pointer; transition: all 0.2s; font-family: inherit; }
+    .sidebar-nav button.active { background: var(--ikea-blue); color: white; font-weight: 600; }
+    .sidebar-nav button:hover:not(.active) { background: #fafafa; }
+    .main-content { flex-grow: 1; min-width: 0; }
+    .tab-pane { display: none; }
+    .tab-pane.active { display: block; }
+    @media (max-width: 640px) { .manage-layout { flex-direction: column; } .sidebar { width: 100%; } }
+    .section { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .section h2 { font-size: 1.1rem; color: var(--ikea-blue); margin-bottom: 14px; }
+    .list { list-style: none; }
+    .list li { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; gap: 8px; }
+    .list li:last-child { border-bottom: none; }
+    .list li .name { flex: 1; font-weight: 500; }
+    .list li .name.system { color: #888; font-style: italic; }
+    .actions { display: flex; gap: 6px; flex-shrink: 0; }
+    .btn { padding: 6px 10px; border-radius: 6px; border: none; font-weight: 600; font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+    .btn-icon { background: #f5f5f5; color: #333; width: 32px; height: 32px; padding: 0; }
+    .btn-icon:hover { background: #e8e8e8; }
+    .btn-del { background: #fee; color: #c00; width: 32px; height: 32px; padding: 0; }
+    .btn-del:hover { background: #fcc; }
+    .btn-add { background: var(--ikea-yellow); color: var(--ikea-blue); padding: 10px 16px; }
+    .add-row { display: flex; gap: 8px; margin-top: 12px; }
+    .add-row input { flex: 1; padding: 10px 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 15px; outline: none; }
+    .add-row input:focus { border-color: var(--ikea-blue); }
+    .empty { color: #888; font-size: 0.9rem; }
+    .hint { font-size: 0.8rem; color: #888; margin-top: 8px; }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 100; display: none; align-items: center; justify-content: center; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: white; width: 90%; max-width: 360px; border-radius: 16px; padding: 24px 20px; }
+    .modal h3 { margin-bottom: 14px; color: var(--ikea-blue); }
+    .modal input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px; margin-bottom: 16px; outline: none; }
+    .modal input:focus { border-color: var(--ikea-blue); }
+    .modal-actions { display: flex; gap: 10px; }
+    .modal-actions button { flex: 1; padding: 12px; border-radius: 8px; border: none; font-weight: 700; cursor: pointer; }
+    .btn-cancel { background: #f0f0f0; color: #333; }
+    .btn-save { background: var(--ikea-blue); color: white; }
+    .btn-danger-full { background: #c00; color: white; }
+    .confirm-text { margin-bottom: 16px; line-height: 1.4; }
+    .confirm-text .del-word { color: #c00; font-weight: 800; font-size: 1.1rem; }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #222; color: white; padding: 12px 20px; border-radius: 999px; font-size: 0.9rem; z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none; }
+    .toast.show { opacity: 1; }
+    .audit-list { display: flex; flex-direction: column; gap: 0; max-height: 70vh; overflow-y: auto; }
+    .audit-entry { display: flex; gap: 12px; padding: 12px 10px; border-bottom: 1px solid #f0f0f0; transition: background .15s; }
+    .audit-entry:hover { background: #f8fafc; }
+    .audit-avatar { width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0; background: #0058A3; color: #fff; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; justify-content: center; }
+    .audit-avatar.place { background: #0d9488; }
+    .audit-avatar.tag { background: #7c3aed; }
+    .audit-body { flex: 1; min-width: 0; }
+    .audit-summary { font-size: 0.9rem; line-height: 1.45; color: #1e293b; word-break: break-word; }
+    .audit-summary strong { font-weight: 700; color: #0f172a; }
+    .audit-meta { font-size: 0.75rem; color: #94a3b8; margin-top: 4px; display: flex; gap: 8px; flex-wrap: wrap; }
+    .audit-action { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; padding: 2px 6px; border-radius: 4px; background: #f1f5f9; color: #64748b; }
+    .audit-action.create { background: #dcfce7; color: #166534; }
+    .audit-action.update { background: #e0f2fe; color: #075985; }
+    .audit-action.delete { background: #fee2e2; color: #991b1b; }
+    .audit-action.rename { background: #fef9c3; color: #854d0e; }
+    .audit-pagination { display: flex; justify-content: center; align-items: center; gap: 12px; margin-top: 16px; }
+    .audit-pagination button { background: #fff; border: 1.5px solid #e2e8f0; padding: 8px 14px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; cursor: pointer; }
+    .audit-pagination button:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner" style="justify-content: space-between;">
+      <a href="/" class="logo-link"><img src="https://cdn.myitem.space/logo%20and%20assets/myitem-icon-small-nottrans.png" alt="MyItem.space" class="logo-img"/></a>
+      <button onclick="logout()" class="logout-btn" title="Logout" style="display: flex; gap: 6px; font-weight: 600; font-size: 0.9rem; padding: 6px 16px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+          <polyline points="16 17 21 12 16 7"></polyline>
+          <line x1="21" y1="12" x2="9" y2="12"></line>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+  <div class="manage-layout">
+    <aside class="sidebar">
+      <ul class="sidebar-nav">
+        <li><button class="nav-btn active" data-target="places-tab">Places</button></li>
+        <li><button class="nav-btn" data-target="tags-tab">Tags (Categories)</button></li>
+        <li><button class="nav-btn" data-target="audit-tab">Audit Log</button></li>
+      </ul>
+    </aside>
+    <main class="main-content">
+      <div id="places-tab" class="tab-pane active">
+        <div class="section">
+          <h2>Places</h2>
+          <ul class="list" id="placeList"><li class="empty">Loading...</li></ul>
+          <div class="add-row">
+            <input type="text" id="newPlace" placeholder="New place name" />
+            <button class="btn btn-add" id="addPlace">Add</button>
+          </div>
+        </div>
+      </div>
+      <div id="tags-tab" class="tab-pane">
+        <div class="section">
+          <h2>Tags (categories)</h2>
+          <ul class="list" id="tagList"><li class="empty">Loading...</li></ul>
+          <div class="add-row">
+            <input type="text" id="newTag" placeholder="New tag name" />
+            <button class="btn btn-add" id="addTag">Add</button>
+          </div>
+          <p class="hint">Uncategorized is system-managed. Deleting a tag that is the only tag on an item moves that item to Uncategorized.</p>
+        </div>
+      </div>
+      <div id="audit-tab" class="tab-pane">
+        <div class="section audit-section">
+          <h2>Audit Log</h2>
+          <p class="hint" style="margin-bottom:14px">Activity for your account — adds, edits, deletes, and tag/place changes.</p>
+          <div id="auditList" class="audit-list"><div class="empty">Loading...</div></div>
+          <div class="audit-pagination" id="auditPagination" style="display:none"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  <div class="modal-overlay" id="renameModal">
+    <div class="modal">
+      <h3 id="renameTitle">Rename</h3>
+      <input type="text" id="renameInput" />
+      <div class="modal-actions">
+        <button class="btn-cancel" id="renameCancel">Cancel</button>
+        <button class="btn-save" id="renameSave">Save</button>
+      </div>
+    </div>
+  </div>
+  <div class="modal-overlay" id="deleteModal">
+    <div class="modal">
+      <div class="confirm-text"><span class="del-word">DELETE</span> <strong id="deleteName"></strong>?</div>
+      <p id="deleteHint" style="font-size:0.85rem;color:#666;margin-bottom:16px"></p>
+      <div class="modal-actions">
+        <button class="btn-cancel" id="deleteCancel">Cancel</button>
+        <button class="btn-danger-full" id="deleteConfirm">Delete</button>
+      </div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+  <script>
+    const API = "/api";
+    let idToken = localStorage.getItem("google_id_token");
+    function logout() {
+      localStorage.removeItem("google_id_token");
+      window.location.href = "/";
+    }
+    if (!idToken) { window.location.href = "/"; }
+    async function apiFetch(path, options = {}) {
+      options.headers = options.headers || {};
+      options.headers["Authorization"] = "Bearer " + idToken;
+      const res = await fetch(API + path, options);
+      if (res.status === 401) {
+        localStorage.removeItem("google_id_token");
+        window.location.href = "/";
+        throw new Error("Unauthorized");
+      }
+      return res;
+    }
+    document.querySelectorAll('.nav-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.querySelectorAll('.tab-pane').forEach(tab => tab.classList.remove('active'));
+        document.getElementById(btn.dataset.target).classList.add('active');
+        if (btn.dataset.target === 'audit-tab') loadAudit(1);
+      });
+    });
+    let renameTarget = null, deleteTarget = null;
+    function toast(msg) { const t = document.getElementById("toast"); t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2200); }
+    function isUncategorized(name) { return (name || "").toLowerCase() === "uncategorized"; }
+    const pencil = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>`;
+    const trash = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>`;
+    function esc(s) { return (s || "").replace(/&/g,"&"+"amp;").replace(/</g,"&"+"lt;").replace(/>/g,"&"+"gt;").replace(/"/g,"&"+"quot;"); }
+    async function loadPlaces() {
+      const places = await (await apiFetch(`/places`)).json();
+      const el = document.getElementById("placeList");
+      if (!places.length) { el.innerHTML = `<li class="empty">No places yet</li>`; return; }
+      el.innerHTML = places.map(p => `<li><span class="name">${esc(p.name)}</span><div class="actions"><button class="btn btn-icon" data-action="rename" data-type="place" data-id="${p.id}" data-name="${esc(p.name)}" title="Rename">${pencil}</button><button class="btn btn-del" data-action="delete" data-type="place" data-id="${p.id}" data-name="${esc(p.name)}" title="Delete">${trash}</button></div></li>`).join("");
+    }
+    async function loadTags() {
+      const tags = await (await apiFetch(`/tags`)).json();
+      const el = document.getElementById("tagList");
+      if (!tags.length) { el.innerHTML = `<li class="empty">No tags yet</li>`; return; }
+      el.innerHTML = tags.map(t => {
+        const sys = isUncategorized(t.name);
+        return `<li><span class="name ${sys ? "system" : ""}">${esc(t.name)}${sys ? " (system)" : ""}</span><div class="actions">${sys ? "" : `<button class="btn btn-icon" data-action="rename" data-type="tag" data-id="${t.id}" data-name="${esc(t.name)}" title="Rename">${pencil}</button><button class="btn btn-del" data-action="delete" data-type="tag" data-id="${t.id}" data-name="${esc(t.name)}" title="Delete">${trash}</button>`}</div></li>`;
+      }).join("");
+    }
+    document.getElementById("addPlace").addEventListener("click", async () => {
+      const name = document.getElementById("newPlace").value.trim(); if (!name) return;
+      const res = await apiFetch(`/places`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      if (res.ok) { document.getElementById("newPlace").value = ""; toast("Place added"); loadPlaces(); }
+      else { const err = await res.json().catch(() => ({})); toast(err.error || "Failed"); }
+    });
+    document.getElementById("addTag").addEventListener("click", async () => {
+      const name = document.getElementById("newTag").value.trim(); if (!name) return;
+      const res = await apiFetch(`/tags`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      if (res.ok) { document.getElementById("newTag").value = ""; toast("Tag added"); loadTags(); }
+      else { const err = await res.json().catch(() => ({})); toast(err.error || "Failed"); }
+    });
+    document.addEventListener("click", (e) => {
+      const btn = e.target.closest("[data-action]"); if (!btn) return;
+      const { action, type, id, name } = btn.dataset;
+      if (action === "rename") {
+        renameTarget = { type, id, name };
+        document.getElementById("renameTitle").textContent = `Rename ${type}`;
+        document.getElementById("renameInput").value = name;
+        document.getElementById("renameModal").classList.add("open");
+        setTimeout(() => document.getElementById("renameInput").focus(), 50);
+      }
+      if (action === "delete") {
+        deleteTarget = { type, id, name };
+        document.getElementById("deleteName").textContent = name;
+        document.getElementById("deleteHint").textContent = type === "tag"
+          ? "Items that only had this tag will move to Uncategorized."
+          : "Items using this place will show as Place deleted.";
+        document.getElementById("deleteModal").classList.add("open");
+      }
+    });
+    document.getElementById("renameCancel").addEventListener("click", () => { document.getElementById("renameModal").classList.remove("open"); renameTarget = null; });
+    document.getElementById("renameModal").addEventListener("click", (e) => { if (e.target.id === "renameModal") { document.getElementById("renameModal").classList.remove("open"); renameTarget = null; } });
+    document.getElementById("renameInput").addEventListener("keydown", (e) => { if (e.key === "Enter") document.getElementById("renameSave").click(); });
+    document.getElementById("renameSave").addEventListener("click", async () => {
+      if (!renameTarget) return;
+      const name = document.getElementById("renameInput").value.trim(); if (!name) { toast("Name required"); return; }
+      const path = renameTarget.type === "place" ? "places" : "tags";
+      const res = await apiFetch(`/${path}/${renameTarget.id}`, { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name }) });
+      if (res.ok) { toast("Renamed"); document.getElementById("renameModal").classList.remove("open"); renameTarget = null; loadPlaces(); loadTags(); }
+      else { const err = await res.json().catch(() => ({})); toast(err.error || "Rename failed"); }
+    });
+    document.getElementById("deleteCancel").addEventListener("click", () => { document.getElementById("deleteModal").classList.remove("open"); deleteTarget = null; });
+    document.getElementById("deleteModal").addEventListener("click", (e) => { if (e.target.id === "deleteModal") { document.getElementById("deleteModal").classList.remove("open"); deleteTarget = null; } });
+    document.getElementById("deleteConfirm").addEventListener("click", async () => {
+      if (!deleteTarget) return;
+      const path = deleteTarget.type === "place" ? "places" : "tags";
+      const res = await apiFetch(`/${path}/${deleteTarget.id}`, { method: "DELETE" });
+      if (res.ok) { toast("Deleted"); document.getElementById("deleteModal").classList.remove("open"); deleteTarget = null; loadPlaces(); loadTags(); }
+      else { const err = await res.json().catch(() => ({})); toast(err.error || "Delete failed"); }
+    });
+    let auditPage = 1;
+    function actionClass(action) {
+      if (!action) return '';
+      if (action.includes('create')) return 'create';
+      if (action.includes('delete')) return 'delete';
+      if (action.includes('rename')) return 'rename';
+      if (action.includes('update')) return 'update';
+      return '';
+    }
+    function actionLabel(action) {
+      if (!action) return 'event';
+      const a = action.split('.').pop();
+      return a || action;
+    }
+    function entityLetter(type) {
+      if (type === 'place') return 'P';
+      if (type === 'tag') return 'T';
+      return 'I';
+    }
+    function formatAuditTime(iso) {
+      if (!iso) return '';
+      if (iso.length === 19 && iso.includes(' ')) iso = iso.replace(' ', 'T') + 'Z';
+      const d = new Date(iso);
+      if (isNaN(d.getTime())) return iso;
+      return d.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    }
+    function renderAuditSummary(summary) {
+      return esc(summary || '').replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    }
+    async function loadAudit(page) {
+      auditPage = page || 1;
+      const el = document.getElementById('auditList');
+      el.innerHTML = '<div class="empty">Loading...</div>';
+      try {
+        const res = await apiFetch(`/audit?page=${auditPage}&limit=20`);
+        const data = await res.json();
+        const logs = data.logs || [];
+        const pag = data.pagination || { totalPages: 1, page: 1 };
+        if (!logs.length) {
+          el.innerHTML = '<div class="empty">No activity yet. Changes to items, places, and tags will show up here.</div>';
+        } else {
+          el.innerHTML = logs.map(log => {
+            const cls = actionClass(log.action);
+            return `<div class="audit-entry">
+              <div class="audit-avatar ${esc(log.entity_type || 'item')}">${entityLetter(log.entity_type)}</div>
+              <div class="audit-body">
+                <div class="audit-summary">${renderAuditSummary(log.summary)}</div>
+                <div class="audit-meta">
+                  <span class="audit-action ${cls}">${esc(actionLabel(log.action))}</span>
+                  <span>${formatAuditTime(log.created_at)}</span>
+                </div>
+              </div>
+            </div>`;
+          }).join('');
+        }
+        const pagEl = document.getElementById('auditPagination');
+        if (pag.totalPages > 1) {
+          pagEl.style.display = 'flex';
+          pagEl.innerHTML = `<button id="auditPrev" ${pag.page<=1?'disabled':''}>Prev</button>
+            <span style="font-weight:600;color:#64748b;font-size:0.9rem">${pag.page} / ${pag.totalPages}</span>
+            <button id="auditNext" ${pag.page>=pag.totalPages?'disabled':''}>Next</button>`;
+          document.getElementById('auditPrev')?.addEventListener('click', () => { if (auditPage>1) loadAudit(auditPage-1); });
+          document.getElementById('auditNext')?.addEventListener('click', () => { if (auditPage<pag.totalPages) loadAudit(auditPage+1); });
+        } else {
+          pagEl.style.display = 'none';
+        }
+      } catch (e) {
+        el.innerHTML = '<div class="empty">Could not load audit log.</div>';
+      }
+    }
+    loadPlaces(); loadTags();
+  </script>
+</body>
+</html>
